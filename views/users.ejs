@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>사용자 관리</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>사용자 목록</h1>
+    <ul id="user-list"></ul>
+
+    <h2>사용자 변경</h2>
+    <form id="user-form">
+      <input type="text" name="name" placeholder="이름" required>
+      <input type="number" name="age" placeholder="나이" required>
+      <button type="button" id="register-btn">등록</button>
+    </form>
+
+    <div style="margin-top: 20px;">
+      <button type="button" id="update-btn">수정</button>
+      <button id="delete-user-btn">삭제</button>
+    </div>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    let selectedUserId = null;
+
+    async function loadUsers() {
+      const res = await fetch('/api/v1/users');
+      const users = await res.json();
+      const list = document.getElementById('user-list');
+      list.innerHTML = '';
+
+      users.forEach(user => {
+        const li = document.createElement('li');
+        li.textContent = `${user.name} (나이: ${user.age})`;
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => {
+          selectedUserId = user.id;
+          document.querySelector('input[name="name"]').value = user.name;
+          document.querySelector('input[name="age"]').value = user.age;
+          document.getElementById('result').textContent = `선택된 사용자 ID: ${user.id}`;
+        });
+        list.appendChild(li);
+      });
+    }
+
+    // 등록 버튼 처리
+    document.getElementById('register-btn').addEventListener('click', async () => {
+      const name = document.querySelector('input[name="name"]').value.trim();
+      const age = parseInt(document.querySelector('input[name="age"]').value);
+
+      if (!name || isNaN(age)) {
+        document.getElementById('result').textContent = '이름과 나이를 올바르게 입력하세요.';
+        return;
+      }
+
+      const res = await fetch('/api/v1/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age })
+      });
+
+      if (res.ok) {
+        document.getElementById('result').textContent = '등록 완료!';
+        document.getElementById('user-form').reset();
+        selectedUserId = null;
+        loadUsers();
+      } else {
+        const err = await res.json();
+        document.getElementById('result').textContent = `오류: ${err.error}`;
+      }
+    });
+
+    // 수정 버튼 
+    document.getElementById('update-btn').addEventListener('click', async () => {
+      if (!selectedUserId) {
+        document.getElementById('result').textContent = '수정할 사용자를 먼저 선택하세요.';
+        return;
+      }
+
+      const name = document.querySelector('input[name="name"]').value.trim();
+      const age = parseInt(document.querySelector('input[name="age"]').value);
+
+      if (!name || isNaN(age)) {
+        document.getElementById('result').textContent = '이름과 나이를 올바르게 입력하세요.';
+        return;
+      }
+
+      const res = await fetch(`/api/v1/user/${selectedUserId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age })
+      });
+
+      if (res.ok) {
+        document.getElementById('result').textContent = '수정 완료!';
+        document.getElementById('user-form').reset();
+        selectedUserId = null;
+        loadUsers();
+      } else {
+        const err = await res.json();
+        document.getElementById('result').textContent = `오류: ${err.error}`;
+      }
+    });
+
+    // 삭제 버튼 
+    document.getElementById('delete-user-btn').addEventListener('click', async () => {
+      if (!selectedUserId) {
+        document.getElementById('result').textContent = '삭제할 사용자를 먼저 선택하세요.';
+        return;
+      }
+
+      const confirmed = confirm('정말 삭제하시겠습니까?');
+      if (!confirmed) return;
+
+      const res = await fetch(`/api/v1/user/${selectedUserId}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        document.getElementById('result').textContent = '삭제 성공!';
+        document.getElementById('user-form').reset();
+        selectedUserId = null;
+        loadUsers();
+      } else {
+        const err = await res.json();
+        document.getElementById('result').textContent = `오류: ${err.error}`;
+      }
+    });
+
+    loadUsers();
+  </script>
+
+
+
+</body>
+</html>

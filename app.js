@@ -1,44 +1,46 @@
-const path = require('path');
 const express = require('express');
-const app = express();
-const userRoutes1 = require('./routes/v1/userRoutes');
+const path = require('path');
+const session = require('express-session'); // 세션 관리 추가
 
-// 미들웨어
+const app = express();
+
+// 미들웨어 설정
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public'))); // 정적 파일 제공
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 세션 설정 (로그인 상태 유지용)
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // HTTPS 사용시 true로 변경
+}));
+
+// 뷰 엔진 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// API 라우트
-app.use('/api/v1', userRoutes1);
+// 라우트 설정
+const loginRoutes = require('./routes/v1/loginRoutes');
+const userRoutes = require('./routes/v1/userRoutes');
 
-// 프론트 페이지 라우트
-app.get('/', (req, res) => {
-  res.redirect('/users');
-});
+app.use('/api/v1', loginRoutes);
+app.use('/api/v1', userRoutes);
 
-app.get('/users', (req, res) => {
-  res.render('users');
-});
-
-app.get('/login', (req,res) => {
-  res.render('login')
-})
-
-app.get('/test', (req, res) => {
-  res.render('test');
-});
-
-
+// 페이지 라우트
+app.get('/', (req, res) => res.render('home'));
+app.get('/login', (req, res) => res.render('login'));
 
 // 404 처리
 app.use((req, res) => {
-  res.status(404).send('Page Not Found');
+  res.status(404).render('404');
 });
 
-app.listen(3000, () => {
-  console.log('Express REST API 서버가 http://localhost:3000 에서 실행 중입니다.');
+// 서버 시작
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
 });
 
 

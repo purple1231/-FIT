@@ -52,7 +52,7 @@ router.put('/user/:id', async (req, res) => {
     await db.query('UPDATE user SET name = ?, age = ? WHERE id = ?', [name, age, id]);
     const [updated] = await db.query('SELECT * FROM user WHERE id = ?', [id]);
     res.json(updated[0]);
-  } catch (err) {
+  } catch (err) {ㄴ
     res.status(500).json({ error: 'DB error' });
   }
 });

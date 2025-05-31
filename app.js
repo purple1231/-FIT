@@ -9,28 +9,55 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
 // 세션 설정 (로그인 상태 유지용)
 app.use(session({
-  secret: 'your-secret-key',
+  secret: 'your-secret-key', // 세션 암호화 키
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // HTTPS 사용시 true로 변경
+  saveUninitialized: false,
+  cookie: { 
+    secure: false, // HTTPS 사용시 true로 변경
+    maxAge: 1000 * 60 * 60 * 24 // 24시간 유지
+  }
 }));
+
+
 
 // 뷰 엔진 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+
+
+
+
+
 // 라우트 설정
 const loginRoutes = require('./routes/v1/loginRoutes');
 const userRoutes = require('./routes/v1/userRoutes');
+const authRoutes = require('./routes/v1/authRoutes');
 
+app.use('/api/v1', authRoutes);
 app.use('/api/v1', loginRoutes);
 app.use('/api/v1', userRoutes);
 
+
+
+
+
+
 // 페이지 라우트
-app.get('/', (req, res) => res.render('home'));
+app.get('/', (req, res) => res.render('test'));
 app.get('/login', (req, res) => res.render('login'));
+app.get('/signup', (req, res) => res.render('signup'));
+app.get('/test', (req, res) => res.render('test'));
+app.get('/users', (req, res) => res.render('users'));
+
+
+
+
+
 
 // 404 처리
 app.use((req, res) => {

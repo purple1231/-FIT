@@ -56,6 +56,15 @@ app.get('/signup', (req, res) => res.render('signup'));
 app.get('/test', (req, res) => res.render('test'));
 app.get('/users', (req, res) => res.render('users'));
 app.get('/apitest', (req, res) => res.render('apitest'));
+app.get('/home', (req, res) => {
+  try {
+    res.render('home'); // 또는: res.render('home', { user: {}, products: [] })
+  } catch (error) {
+    console.error('홈 렌더링 에러:', error.message);
+    res.status(500).send('서버 렌더링 오류 발생');
+  }
+});
+
 
 
 

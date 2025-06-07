@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= item.name %> - ShopMall</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/detail.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">ShopMall</a>
+            <ul class="nav-links">
+                <li><a href="#">홈</a></li>
+                <li><a href="#">카테고리</a></li>
+                <li><a href="#">베스트</a></li>
+                <li><a href="#">세일</a></li>
+                <li><a href="#">브랜드</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#"><i class="fas fa-search"></i></a>
+                <a href="#"><i class="fas fa-heart"></i></a>
+                <a href="#" id="cartIcon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">2</span>
+                </a>
+                <a href="#"><i class="fas fa-user"></i></a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav">
+                <a href="#">홈</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#">의류</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#"><%= item.type %></a>
+                <i class="fas fa-chevron-right"></i>
+                <span><%= item.name %></span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Product Detail -->
+    <section class="product-detail">
+        <div class="container">
+            <div class="product-container">
+                <!-- Product Images -->
+                <div class="product-images">
+                    <img src="<%= item.image_url %>" alt="<%= item.name %>" class="main-image" id="mainImage">
+                    <div class="thumbnail-images">
+                        <img src="<%= item.image_url %>" alt="썸네일 1" class="thumbnail active" onclick="changeMainImage(this)">
+                        <img src="https://source.unsplash.com/500x500?knitwear" alt="썸네일 2" class="thumbnail" onclick="changeMainImage(this)">
+                        <img src="https://source.unsplash.com/500x500?wool" alt="썸네일 3" class="thumbnail" onclick="changeMainImage(this)">
+                        <img src="https://source.unsplash.com/500x500?fashion" alt="썸네일 4" class="thumbnail" onclick="changeMainImage(this)">
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-info">
+                    <h1 class="product-title"><%= item.name %></h1>
+                    
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="rating-text">4.5 (128 리뷰)</span>
+                    </div>
+
+                    <div class="product-price">
+                        <span class="current-price"><%= item.price.toLocaleString() %>원</span>
+                        <% if (item.original_price) { %>
+                            <span class="original-price"><%= item.original_price.toLocaleString() %>원</span>
+                            <% const discount = Math.round((1 - item.price / item.original_price) * 100); %>
+                            <span class="discount-badge"><%= discount %>% 할인</span>
+                        <% } %>
+                    </div>
+
+                    <div class="product-options">
+                        <!-- Color Selection -->
+                        <div class="option-group">
+                            <label class="option-label">색상 선택</label>
+                            <div class="color-options">
+                                <div class="color-option color-black active" data-color="블랙" onclick="selectColor(this)"></div>
+                                <div class="color-option color-white" data-color="화이트" onclick="selectColor(this)"></div>
+                                <div class="color-option color-gray" data-color="그레이" onclick="selectColor(this)"></div>
+                                <div class="color-option color-navy" data-color="네이비" onclick="selectColor(this)"></div>
+                            </div>
+                            <p>선택된 색상: <span id="selectedColor">블랙</span></p>
+                        </div>
+
+                        <!-- Size Selection -->
+                        <div class="option-group">
+                            <label class="option-label">사이즈 선택</label>
+                            <div class="size-options">
+                                <div class="size-option" data-size="XS" onclick="selectSize(this)">XS</div>
+                                <div class="size-option" data-size="S" onclick="selectSize(this)">S</div>
+                                <div class="size-option active" data-size="M" onclick="selectSize(this)">M</div>
+                                <div class="size-option" data-size="L" onclick="selectSize(this)">L</div>
+                                <div class="size-option" data-size="XL" onclick="selectSize(this)">XL</div>
+                                <div class="size-option disabled" data-size="XXL">XXL (품절)</div>
+                            </div>
+                            <a href="#" class="size-guide">사이즈 가이드 <i class="fas fa-ruler"></i></a>
+                            <p>선택된 사이즈: <span id="selectedSize">M</span></p>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="option-group">
+                            <label class="option-label">수량</label>
+                            <div class="quantity-selector">
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                                    <input type="number" class="quantity-input" value="1" min="1" max="10" id="quantity">
+                                    <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Try-On Section -->
+                    <div class="ai-try-on">
+                        <h3><i class="fas fa-magic"></i> AI 가상 피팅</h3>
+                        <p>내 사진에 이 옷을 가상으로 입어보세요!</p>
+                        <button class="btn btn-ai" onclick="openAIModal()">
+                            <i class="fas fa-camera"></i> AI 옷입히기
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-wishlist" onclick="toggleWishlist()">
+                            <i class="far fa-heart" id="wishlistIcon"></i>
+                        </button>
+                        <button class="btn btn-secondary" onclick="addToCart()">
+                            <i class="fas fa-shopping-cart"></i> 장바구니
+                        </button>
+                        <button class="btn btn-primary" onclick="buyNow()">
+                            <i class="fas fa-bolt"></i> 바로구매
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Tabs -->
+            <div class="product-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('description')">상품설명</button>
+                    <button class="tab-btn" onclick="showTab('reviews')">리뷰 (128)</button>
+                    <button class="tab-btn" onclick="showTab('shipping')">배송/교환</button>
+                    <button class="tab-btn" onclick="showTab('qna')">Q&A</button>
+                </div>
+
+                <div class="tab-content active" id="description">
+                    <h3>상품 상세 정보</h3>
+                    <p><%= item.description %></p>
+                    <br>
+                    <h4>소재 및 관리법</h4>
+                    <ul>
+                        <li>소재: <%= item.material || '울 70%, 캐시미어 20%, 나일론 10%' %></li>
+                        <li>세탁: <%= item.washing_method || '드라이클리닝 권장' %></li>
+                        <li>보관: <%= item.storage_method || '통풍이 잘 되는 곳에 보관' %></li>
+                    </ul>
+                    <br>
+                    <h4>사이즈 정보</h4>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">사이즈</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">어깨너비</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">가슴둘레</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">소매길이</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">총길이</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">S</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">42cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">96cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">58cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">62cm</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">M</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">44cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">100cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">60cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">64cm</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">L</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">46cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">104cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">62cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">66cm</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="reviews">
+                    <h3>고객 리뷰</h3>
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">김**</span>
+                            <span class="review-date">2024.01.15</span>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>정말 따뜻하고 부드러워요! 디자인도 예쁘고 품질이 좋습니다. 추천해요!</p>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name">이**</span>
+                            <span class="review-date">2024.01.12</span>
+                        </div>
+                        <div class="review-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <p>사이즈가 딱 맞고 색상도 사진과 동일해요. 만족합니다.</p>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="shipping">
+                    <h3>배송 및 교환/반품 안내</h3>
+                    <h4>배송 정보</h4>
+                    <ul>
+                        <li>배송비: 무료 (5만원 이상 구매시)</li>
+                        <li>배송기간: 주문 후 1-3일 (영업일 기준)</li>
+                        <li>배송지역: 전국 (제주도, 도서산간 지역 추가 배송비)</li>
+                    </ul>
+                    <br>
+                    <h4>교환/반품 안내</h4>
+                    <ul>
+                        <li>교환/반품 기간: 상품 수령 후 7일 이내</li>
+                        <li>교환/반품 비용: 고객 변심시 왕복 배송비 고객 부담</li>
+                        <li>교환/반품 불가: 착용 흔적이 있는 경우, 세탁한 경우</li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="qna">
+                    <h3>상품 문의</h3>
+                    <p>상품에 대한 궁금한 점이 있으시면 언제든지 문의해 주세요.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">문의하기</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Try-On Modal -->
+    <div class="modal" id="aiModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-magic"></i> AI 가상 피팅</h2>
+                <button class="close-modal" onclick="closeAIModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>사진을 업로드하세요</h3>
+                    <p>전신 사진을 업로드하면 AI가 이 옷을 입혀드립니다</p>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileUpload(event)">
+                </div>
+                <div class="preview-container" id="previewContainer">
+                    <img id="previewImage" class="preview-image" alt="미리보기">
+                    <button class="btn btn-primary" onclick="processAI()">
+                        <i class="fas fa-magic"></i> AI 처리 시작
+                    </button>
+                </div>
+                <div id="aiResult" style="display: none; text-align: center; margin-top: 2rem;">
+                    <h3>AI 처리 완료!</h3>
+                    <p>가상 피팅 결과입니다.</p>
+                    <button class="btn btn-secondary" onclick="downloadResult()">
+                        <i class="fas fa-download"></i> 결과 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image gallery
+        function changeMainImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            
+            mainImage.src = thumbnail.src;
+            thumbnails.forEach(thumb => thumb.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+
+        // Color selection
+        function selectColor(colorOption) {
+            const colorOptions = document.querySelectorAll('.color-option');
+            const selectedColorSpan = document.getElementById('selectedColor');
+            
+            colorOptions.forEach(option => option.classList.remove('active'));
+            colorOption.classList.add('active');
+            selectedColorSpan.textContent = colorOption.dataset.color;
+        }
+
+        // Size selection
+        function selectSize(sizeOption) {
+            if (sizeOption.classList.contains('disabled')) return;
+            
+            const sizeOptions = document.querySelectorAll('.size-option:not(.disabled)');
+            const selectedSizeSpan = document.getElementById('selectedSize');
+            
+            sizeOptions.forEach(option => option.classList.remove('active'));
+            sizeOption.classList.add('active');
+            selectedSizeSpan.textContent = sizeOption.dataset.size;
+        }
+
+        // Quantity control
+        function changeQuantity(change) {
+            const quantityInput = document.getElementById('quantity');
+            let currentValue = parseInt(quantityInput.value);
+            let newValue = currentValue + change;
+            
+            if (newValue >= 1 && newValue <= 10) {
+                quantityInput.value = newValue;
+            }
+        }
+
+        // Wishlist toggle
+        function toggleWishlist() {
+            const wishlistIcon = document.getElementById('wishlistIcon');
+            if (wishlistIcon.classList.contains('far')) {
+                wishlistIcon.classList.remove('far');
+                wishlistIcon.classList.add('fas');
+                alert('찜 목록에 추가되었습니다!');
+            } else {
+                wishlistIcon.classList.remove('fas');
+                wishlistIcon.classList.add('far');
+                alert('찜 목록에서 제거되었습니다!');
+            }
+        }
+
+        // Add to cart
+        function addToCart() {
+            const selectedSize = document.getElementById('selectedSize').textContent;
+            const selectedColor = document.getElementById('selectedColor').textContent;
+            const quantity = document.getElementById('quantity').value;
+            
+            alert(`장바구니에 추가되었습니다!\n색상: ${selectedColor}\n사이즈: ${selectedSize}\n수량: ${quantity}`);
+        }
+
+        // Buy now
+        function buyNow() {
+            const selectedSize = document.getElementById('selectedSize').textContent;
+            const selectedColor = document.getElementById('selectedColor').textContent;
+            const quantity = document.getElementById('quantity').value;
+            
+            alert(`주문 페이지로 이동합니다!\n색상: ${selectedColor}\n사이즈: ${selectedSize}\n수량: ${quantity}`);
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // AI Modal functions
+        function openAIModal() {
+            document.getElementById('aiModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Reset modal state
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('aiResult').style.display = 'none';
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('uploadArea').style.display = 'none';
+                    document.getElementById('previewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function processAI() {
+            // Simulate AI processing
+            alert('AI 처리를 시작합니다. 잠시만 기다려주세요...');
+            
+            setTimeout(() => {
+                document.getElementById('previewContainer').style.display = 'none';
+                document.getElementById('aiResult').style.display = 'block';
+            }, 2000);
+        }
+
+        function downloadResult() {
+            alert('AI 처리 결과가 다운로드됩니다!');
+        }
+
+        // Drag and drop for file upload
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('previewImage').src = e.target.result;
+                        document.getElementById('uploadArea').style.display = 'none';
+                        document.getElementById('previewContainer').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('aiModal');
+            if (e.target === modal) {
+                closeAIModal();
+            }
+        });
+    </script>
+</body>
+</html>

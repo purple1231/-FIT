@@ -38,11 +38,14 @@ const loginRoutes = require('./routes/v1/loginRoutes');
 const userRoutes = require('./routes/v1/userRoutes');
 const authRoutes = require('./routes/v1/authRoutes');
 const tryonRoutes = require('./routes/v1/tryon');
+const detailRouter = require('./routes/v1/detailRouter');
+console.log('✅ detailRouter:', detailRouter); // 확인용
 
 app.use('/api/v1', tryonRoutes); // 가상 피팅 라우트 추가
 app.use('/api/v1', authRoutes);
 app.use('/api/v1', loginRoutes);
 app.use('/api/v1', userRoutes);
+app.use('/api/v1', detailRouter);
 
 
 
@@ -56,6 +59,8 @@ app.get('/signup', (req, res) => res.render('signup'));
 app.get('/test', (req, res) => res.render('test'));
 app.get('/users', (req, res) => res.render('users'));
 app.get('/apitest', (req, res) => res.render('apitest'));
+app.get('/mainImsi', (req, res) => res.render('mainImsi'));
+
 app.get('/home', (req, res) => {
   try {
     res.render('home'); // 또는: res.render('home', { user: {}, products: [] })

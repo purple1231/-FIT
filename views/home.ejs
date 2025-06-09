@@ -524,80 +524,45 @@
     </div>
 
     <script>
-        // Sample product data
-        const products = [
-            {
-                id: 1,
-                name: "클래식 화이트 셔츠",
-                price: 89000,
-                originalPrice: 120000,
-                category: "men",
-                image: "/placeholder.svg?height=250&width=280"
-            },
-            {
-                id: 2,
-                name: "데님 재킷",
-                price: 159000,
-                originalPrice: 200000,
-                category: "women",
-                image: "/placeholder.svg?height=250&width=280"
-            },
-            {
-                id: 3,
-                name: "레더 핸드백",
-                price: 299000,
-                originalPrice: 350000,
-                category: "accessories",
-                image: "/placeholder.svg?height=250&width=280"
-            },
-            {
-                id: 4,
-                name: "스니커즈",
-                price: 129000,
-                originalPrice: 160000,
-                category: "shoes",
-                image: "/placeholder.svg?height=250&width=280"
-            },
-            {
-                id: 5,
-                name: "니트 스웨터",
-                price: 79000,
-                originalPrice: 100000,
-                category: "women",
-                image: "/placeholder.svg?height=250&width=280"
-            },
-            {
-                id: 6,
-                name: "정장 바지",
-                price: 119000,
-                originalPrice: 150000,
-                category: "men",
-                image: "/placeholder.svg?height=250&width=280"
+             // Sample product data
+
+            let products = []; // 전역에서 사용할 DB 기반 상품 목록
+            let cart = [];
+            let currentFilter = 'all';
+
+            // 상품 로드 함수
+            async function loadProducts(filter = 'all') {
+                const productGrid = document.getElementById('product-grid');
+                try {
+                    const res = await fetch('/api/v1/cloth');
+                    products = await res.json(); // ← 전역 변수에 저장
+
+                    // 콘솔에 cloth 테이블 데이터 출력
+                    console.log('cloth 테이블에서 받아온 상품 데이터:', products);
+
+                    // gender로 필터링
+                    const filteredProducts = filter === 'all' 
+                        ? products 
+                        : products.filter(p => p.gender === filter);
+
+                    productGrid.innerHTML = filteredProducts.map(product => `
+    <div class="product-card" onclick="goToDetail(${product.id})" style="cursor:pointer;">
+        <img src="${product.image_url}" alt="${product.name}">
+        <div class="product-info">
+            <h3>${product.name}</h3>
+            <div class="product-price">
+                ${Number(product.price).toLocaleString()}원
+            </div>
+            <button class="btn" onclick="event.stopPropagation(); addToCart(${product.id})">장바구니 담기</button>
+        </div>
+    </div>
+`).join('');
+                } catch (err) {
+                    productGrid.innerHTML = '<p>상품을 불러오는 데 실패했습니다.</p>';
+                    console.error(err);
+                }
             }
-        ];
 
-        let cart = [];
-        let currentFilter = 'all';
-
-        // Load products
-        function loadProducts(filter = 'all') {
-            const productGrid = document.getElementById('product-grid');
-            const filteredProducts = filter === 'all' ? products : products.filter(p => p.category === filter);
-            
-            productGrid.innerHTML = filteredProducts.map(product => `
-                <div class="product-card">
-                    <img src="${product.image}" alt="${product.name}">
-                    <div class="product-info">
-                        <h3>${product.name}</h3>
-                        <div class="product-price">
-                            <span class="original-price">${product.originalPrice.toLocaleString()}원</span>
-                            ${product.price.toLocaleString()}원
-                        </div>
-                        <button class="btn" onclick="addToCart(${product.id})">장바구니 담기</button>
-                    </div>
-                </div>
-            `).join('');
-        }
 
         // Filter products
         function filterProducts(category) {
@@ -632,7 +597,7 @@
             // Update cart items
             cartItems.innerHTML = cart.map(item => `
                 <div class="cart-item">
-                    <img src="${item.image}" alt="${item.name}">
+                    <img src="${item.image_url}" alt="${item.name}">
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>
                         <div class="cart-item-price">${item.price.toLocaleString()}원 x ${item.quantity}</div>
@@ -693,6 +658,24 @@
                 }
             });
         });
+
+        // 상세 페이지 이동 함수 추가
+function goToDetail(itemId) {
+    // form 생성
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/v1/detail';
+
+    // itemId input 추가
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'itemId';
+    input.value = itemId;
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
+}
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {

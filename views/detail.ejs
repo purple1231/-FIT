@@ -13,7 +13,7 @@
     <!-- Header -->
     <header>
         <nav class="container">
-            <a href="#" class="logo">ShopMall</a>
+            <a href="#" class="logo">FIT AI 쇼핑몰</a>
             <ul class="nav-links">
                 <li><a href="#">홈</a></li>
                 <li><a href="#">카테고리</a></li>
@@ -297,6 +297,11 @@
     </div>
 
     <script>
+
+
+        
+
+
         // Image gallery
         function changeMainImage(thumbnail) {
             const mainImage = document.getElementById('mainImage');
@@ -354,15 +359,38 @@
             }
         }
 
-        // Add to cart
+
         function addToCart() {
             const selectedSize = document.getElementById('selectedSize').textContent;
             const selectedColor = document.getElementById('selectedColor').textContent;
             const quantity = document.getElementById('quantity').value;
-            
-            alert(`장바구니에 추가되었습니다!\n색상: ${selectedColor}\n사이즈: ${selectedSize}\n수량: ${quantity}`);
-        }
 
+            fetch('/api/v1/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    //itemId: '<%= item.id %>',
+                    size: selectedSize,
+                    color: selectedColor,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('장바구니에 담겼습니다!');
+                } else {
+                    alert('장바구니 담기에 실패했습니다.');
+                }
+            })
+            .catch(() => {
+                alert('장바구니 요청 중 오류가 발생했습니다.');
+            });
+            alert('선택된 사이즈: ' + selectedSize);
+        } 
+        
         // Buy now
         function buyNow() {
             const selectedSize = document.getElementById('selectedSize').textContent;
@@ -465,6 +493,11 @@
                 closeAIModal();
             }
         });
-    </script>
+
+        
+        
+        
+        </script>
 </body>
+</html>
 </html>

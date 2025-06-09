@@ -17,8 +17,9 @@ router.post('/detail', async (req, res) => {
     }
 
     const item = results[0];
+    const user = req.session.user; // 세션에서 user 가져오기
     console.log('🎯🎯🎯🎯 상품 조회 성공:', item);
-    res.render('detail', { item });
+    res.render('detail', { item, user }); // user 함께 전달
   } catch (err) {
     console.error('❌ DB 오류:', err);
     res.status(500).send('DB 오류 발생');

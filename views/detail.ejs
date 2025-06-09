@@ -361,9 +361,11 @@
 
 
         function addToCart() {
-            const selectedSize = document.getElementById('selectedSize').textContent;
-            const selectedColor = document.getElementById('selectedColor').textContent;
+            const size = document.getElementById('selectedSize').textContent;
             const quantity = document.getElementById('quantity').value;
+            const user_id = '<%= user.id %>'; 
+            const cloth_id = '<%= item.id %>'; 
+            const name = '<%= item.name %>'; 
 
             fetch('/api/v1/cart', {
                 method: 'POST',
@@ -371,10 +373,11 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    //itemId: '<%= item.id %>',
-                    size: selectedSize,
-                    color: selectedColor,
-                    quantity: quantity
+                    size: size,
+                    quantity: quantity,
+                    user_id: user_id,
+                    cloth_id: cloth_id,
+                    name: name
                 })
             })
             .then(response => response.json())
@@ -388,7 +391,7 @@
             .catch(() => {
                 alert('장바구니 요청 중 오류가 발생했습니다.');
             });
-            alert('선택된 사이즈: ' + selectedSize);
+            alert('선택된 사이즈: ' + size);
         } 
         
         // Buy now

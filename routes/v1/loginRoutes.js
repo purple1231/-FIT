@@ -42,6 +42,7 @@ router.post('/login', async (req, res) => {
       id: user.id,
       username: user.username,
       email: user.email,
+      my_url: user.my_url,  // 추가된 부분
       loggedIn: true
     };
     // 세션 저장 후 로그로 확인

@@ -8,7 +8,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-
+// 정적 파일 서빙 설정
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 
 // 세션 설정 (로그인 상태 유지용)

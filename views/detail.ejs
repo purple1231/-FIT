@@ -366,8 +366,9 @@
             const user_id = '<%= user.id %>'; 
             const cloth_id = '<%= item.id %>'; 
             const name = '<%= item.name %>'; 
+            const image_url = "<%= item.image_url %>";
 
-            fetch('/api/v1/cart', {
+            fetch('/api/v1/cartgo', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -377,7 +378,8 @@
                     quantity: quantity,
                     user_id: user_id,
                     cloth_id: cloth_id,
-                    name: name
+                    name: name,
+                    image_url: image_url
                 })
             })
             .then(response => response.json())

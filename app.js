@@ -42,6 +42,7 @@ const tryonRoutes = require('./routes/v1/tryon');
 const detailRouter = require('./routes/v1/detailRouter');
 const gotoCartRouter = require('./routes/v1/gotoCartRouter'); // 장바구니 라우트 추가
 const clothRouter = require('./routes/v1/clothRouter');
+const checkClothRouter = require('./routes/v1/checkCloth'); 
 console.log('✅ detailRouter:', detailRouter); // 확인용
 
 app.use('/api/v1', tryonRoutes); // 가상 피팅 라우트 추가
@@ -51,6 +52,7 @@ app.use('/api/v1', userRoutes);
 app.use('/api/v1', detailRouter);
 app.use('/api/v1', gotoCartRouter); // 장바구니 라우트 추가
 app.use('/api/v1', clothRouter);
+app.use('/api/v1', checkClothRouter); // 옷 체크 라우트 추가
 
 
 

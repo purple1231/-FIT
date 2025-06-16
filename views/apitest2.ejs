@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Try-On 상의/하의 위치</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+  <style>
+    canvas { border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>이미지 업로드 후 상의/하의 중심에 점 찍기</h1>
+
+  <form action="/api/v1/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">업로드</button>
+  </form>
+
+  <% if (imageUrl) { %>
+    <h3>업로드된 이미지:</h3>
+    <img id="sourceImg" src="<%= imageUrl %>" style="display:none;" crossorigin="anonymous">
+    <canvas id="canvas" width="500" height="700"></canvas>
+  <% } %>
+
+  <% if (imageUrl) { %>
+  <script>
+    const img = document.getElementById('sourceImg');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const pose = new Pose({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+    });
+
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false
+    });
+
+    pose.onResults((results) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const lm = results.poseLandmarks;
+      if (!lm) return;
+
+      const scaleX = canvas.width;
+      const scaleY = canvas.height;
+
+      // 상의 중심: 어깨 + 골반
+      const topX = ((lm[11].x + lm[12].x) / 2) * scaleX;
+      const topY = ((lm[11].y + lm[12].y) / 2) * scaleY;
+
+      const bottomX = ((lm[23].x + lm[24].x) / 2) * scaleX;
+      const bottomY = ((lm[25].y + lm[26].y) / 2) * scaleY;
+
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      ctx.arc(topX, topY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillText("상의", topX + 10, topY);
+
+      ctx.fillStyle = "blue";
+      ctx.beginPath();
+      ctx.arc(bottomX, bottomY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.fillText("하의", bottomX + 10, bottomY);
+    });
+
+    img.onload = () => {
+      pose.send({ image: img });
+    };
+  </script>
+  <% } %>
+</body>
+</html>

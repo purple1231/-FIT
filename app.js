@@ -32,6 +32,11 @@ app.set('views', path.join(__dirname, 'views'));
 
 
 
+console.log("✅ cartRouter 라우트 등록 전");
+const cartRouter = require("./routes/v1/cart");
+app.use("/cart", cartRouter);
+console.log("✅ cartRouter 라우트 등록 후");
+
 
 
 // 라우트 설정
@@ -74,8 +79,6 @@ app.get('/home', (req, res) => {
     res.status(500).send('서버 렌더링 오류 발생');
   }
 });
-
-
 
 
 

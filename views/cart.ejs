@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= shopName %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: #e74c3c;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-icon {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 50px;
+        }
+
+        .cart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #eee;
+            gap: 25px;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 120px;
+            height: 120px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .item-description {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .item-category {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .original-price {
+            color: #999;
+            text-decoration: line-through;
+            font-size: 1rem;
+        }
+
+        .current-price {
+            color: #e74c3c;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 0 30px;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e74c3c;
+            background: white;
+            color: #e74c3c;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .quantity-input {
+            width: 70px;
+            height: 40px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .cart-summary {
+            margin-top: 50px;
+            padding-top: 40px;
+            border-top: 2px solid #eee;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .summary-row.total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            border-top: 2px solid #eee;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+
+        .checkout-section {
+            margin-top: 40px;
+            text-align: center;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .checkout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            background: #c0392b;
+        }
+
+        .continue-shopping {
+            background: white;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+            padding: 18px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .continue-shopping:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .empty-cart h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .empty-cart p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-menu {
+                gap: 20px;
+            }
+
+            .cart-container {
+                padding: 20px;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+
+            .item-image {
+                width: 100px;
+                height: 100px;
+            }
+
+            .quantity-controls {
+                margin: 0;
+            }
+
+            .checkout-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .checkout-btn, .continue-shopping {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">Fashion Store</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/">홈</a></li>
+                    <li><a href="#categories">카테고리</a></li>
+                    <li><a href="#products">상품</a></li>
+                    <li><a href="#about">소개</a></li>
+                    <li><a href="#contact">연락처</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="/cart" class="cart-icon">
+                    🛒
+                    <% if (cartCount > 0) { %>
+                        <span class="cart-count"><%= cartCount %></span>
+                    <% } %>
+                </a>
+                <span class="user-icon">👤</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">장바구니</h1>
+        
+        <div class="cart-container">
+            <% if (cartItems && cartItems.length > 0) { %>
+                <div id="cart-items">
+                    <% cartItems.forEach(function(item) { %>
+                        <div class="cart-item" data-id="<%= item.id %>">
+                            <div class="item-image">
+                                <% if (item.image) { %>
+                                    <img src="<%= item.image %>" alt="<%= item.name %>">
+                                <% } else { %>
+                                    <%= item.name %>
+                                <% } %>
+                            </div>
+                            <div class="item-details">
+                                <div class="item-name"><%= item.name %></div>
+                                <div class="item-description"><%= item.description %></div>
+                                <div class="item-category"><%= item.category %></div>
+                                <div class="price-container">
+                                    <% if (item.originalPrice && item.originalPrice > item.price) { %>
+                                        <span class="original-price"><%= formatPrice(item.originalPrice) %>원</span>
+                                    <% } %>
+                                    <span class="current-price"><%= formatPrice(item.price) %>원</span>
+                                </div>
+                            </div>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="decreaseQuantity(this)">-</button>
+                                <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" data-price="<%= item.price %>" onchange="updateQuantity(this)">
+                                <button class="quantity-btn" onclick="increaseQuantity(this)">+</button>
+                            </div>
+                            <button class="remove-btn" onclick="removeItem(this, '<%= item.id %>')">삭제</button>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>상품 금액:</span>
+                        <span id="subtotal"><%= formatPrice(summary.subtotal) %>원</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>배송비:</span>
+                        <span id="shipping"><%= formatPrice(summary.shipping) %>원</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>할인:</span>
+                        <span id="discount">-<%= formatPrice(summary.discount) %>원</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>총 결제 금액:</span>
+                        <span id="total"><%= formatPrice(summary.total) %>원</span>
+                    </div>
+                </div>
+
+                <div class="checkout-section">
+                    <button class="checkout-btn" onclick="checkout()">주문하기</button>
+                    <a href="/" class="continue-shopping">쇼핑 계속하기</a>
+                </div>
+            <% } else { %>
+                <div class="empty-cart">
+                    <h3>장바구니가 비어있습니다</h3>
+                    <p>Fashion Store의 멋진 상품들을 둘러보세요!</p>
+                    <a href="/" class="continue-shopping">쇼핑하러 가기</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        function increaseQuantity(button) {
+            const input = button.previousElementSibling;
+            input.value = parseInt(input.value) + 1;
+            updateQuantity(input);
+        }
+
+        function decreaseQuantity(button) {
+            const input = button.nextElementSibling;
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+                updateQuantity(input);
+            }
+        }
+
+        async function updateQuantity(input) {
+            const cartItem = input.closest('.cart-item');
+            const itemId = cartItem.dataset.id;
+            const quantity = parseInt(input.value);
+
+            try {
+                const response = await fetch(`/cart/update/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quantity })
+                });
+
+                if (response.ok) {
+                    updateTotal();
+                } else {
+                    alert('수량 업데이트 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                alert('수량 업데이트 중 오류가 발생했습니다.');
+            }
+        }
+
+        async function removeItem(button, itemId) {
+            if (confirm('이 상품을 장바구니에서 삭제하시겠습니까?')) {
+                try {
+                    const response = await fetch(`/cart/remove/${itemId}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (response.ok) {
+                        button.closest('.cart-item').remove();
+                        updateTotal();
+                        checkEmptyCart();
+                    } else {
+                        alert('상품 삭제 중 오류가 발생했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error removing item:', error);
+                    alert('상품 삭제 중 오류가 발생했습니다.');
+                }
+            }
+        }
+
+        function updateTotal() {
+            const cartItems = document.querySelectorAll('.cart-item');
+            let subtotal = 0;
+
+            cartItems.forEach(item => {
+                const quantityInput = item.querySelector('.quantity-input');
+                const price = parseInt(quantityInput.dataset.price);
+                const quantity = parseInt(quantityInput.value);
+                subtotal += price * quantity;
+            });
+
+            const shipping = subtotal > 100000 ? 0 : 3000;
+            const discount = subtotal > 200000 ? 10000 : 0;
+            const total = subtotal + shipping - discount;
+
+            document.getElementById('subtotal').textContent = formatPrice(subtotal) + '원';
+            document.getElementById('shipping').textContent = formatPrice(shipping) + '원';
+            document.getElementById('discount').textContent = '-' + formatPrice(discount) + '원';
+            document.getElementById('total').textContent = formatPrice(total) + '원';
+        }
+
+        function formatPrice(price) {
+            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function checkEmptyCart() {
+            const cartItems = document.getElementById('cart-items');
+            if (cartItems.children.length === 0) {
+                location.reload();
+            }
+        }
+
+        function checkout() {
+            alert('주문 페이지로 이동합니다!');
+            // 실제 구현에서는 결제 페이지로 이동
+        }
+    </script>
+</body>
+</html>

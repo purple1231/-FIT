@@ -25,6 +25,7 @@ router.post('/cartgo', async (req, res) => {
     );
 
     if (rows.length > 0) {
+      console.log('이미 장바구니에 존재하는 상품입니다.');
       return res.status(409).json({ error: '이미 장바구니에 존재하는 상품입니다.' });
     }
 

@@ -576,28 +576,62 @@
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
-                display: none;
+            display: none;
             }
 
             .product-container {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+            grid-template-columns: 1fr;
+            gap: 2rem;
             }
 
             .action-buttons {
-                flex-direction: column;
+            flex-direction: column;
             }
 
             .size-options {
-                flex-wrap: wrap;
+            flex-wrap: wrap;
             }
 
             .tab-buttons {
-                overflow-x: auto;
+            overflow-x: auto;
             }
 
             .modal-content {
-                margin: 1rem;
-                padding: 1rem;
+            margin: 1rem;
+            padding: 1rem;
+            }
+
+            .cart-popup {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff7f00; /* 주황색 */
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 1000;
+            transition: bottom 0.4s ease-out;
+            }
+            .cart-popup.show {
+            bottom: 50px;
+            }
+            .cart-popup button {
+            background-color: white;
+            color: #ff7f00;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+            }
+            .cart-popup button:hover {
+            background-color: #ffe0c2;
             }
         }

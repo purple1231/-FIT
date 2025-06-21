@@ -1,435 +1,60 @@
+<!-- 예시: EJS를 사용한 결제 페이지 템플릿 -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>결제하기 - ShopMall</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        header {
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #e74c3c;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #e74c3c;
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            margin-top: 100px;
-            padding: 1rem 0;
-            background: white;
-            border-bottom: 1px solid #eee;
-        }
-
-        .breadcrumb-nav {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .breadcrumb-nav a {
-            color: #666;
-            text-decoration: none;
-        }
-
-        .breadcrumb-nav a:hover {
-            color: #e74c3c;
-        }
-
-        /* Payment Section */
-        .payment-section {
-            background: white;
-            padding: 2rem 0;
-            min-height: calc(100vh - 200px);
-        }
-
-        .payment-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .payment-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .form-section {
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        .form-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #e74c3c;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-row-3 {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-        }
-
-        .form-select:focus {
-            outline: none;
-            border-color: #e74c3c;
-        }
-
-        /* Order Summary */
-        .order-summary {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            height: fit-content;
-            position: sticky;
-            top: 120px;
-        }
-
-        .summary-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            color: #333;
-        }
-
-        .product-item {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid #eee;
-        }
-
-        .product-image {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-        .product-details {
-            flex: 1;
-        }
-
-        .product-name {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-options {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            font-weight: bold;
-            color: #e74c3c;
-        }
-
-        .price-breakdown {
-            margin-top: 1rem;
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem 0;
-        }
-
-        .price-row.total {
-            border-top: 2px solid #eee;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #e74c3c;
-        }
-
-        /* Payment Methods */
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .payment-method {
-            display: none;
-        }
-
-        .payment-method-label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .payment-method-label:hover {
-            border-color: #e74c3c;
-        }
-
-        .payment-method:checked + .payment-method-label {
-            border-color: #e74c3c;
-            background: #fff5f5;
-        }
-
-        .payment-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: #e74c3c;
-            color: white;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            background: #c0392b;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #e74c3c;
-            border: 2px solid #e74c3c;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: #e74c3c;
-            color: white;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .payment-container {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row-3 {
-                grid-template-columns: 1fr;
-            }
-
-            .payment-methods {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .order-summary {
-                position: static;
-            }
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-        }
-
-        .checkbox-group label {
-            margin-bottom: 0;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles/payment.css"> <!-- CSS는 외부로 분리된 상태 -->
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav class="container">
-            <a href="/" class="logo">ShopMall</a>
-            <ul class="nav-links">
-                <li><a href="/">홈</a></li>
-                <li><a href="/products">상품</a></li>
-                <li><a href="/about">소개</a></li>
-                <li><a href="/contact">문의</a></li>
-            </ul>
+<header>
+    <nav class="container">
+        <a href="/" class="logo">ShopMall</a>
+        <ul class="nav-links">
+            <li><a href="/">홈</a></li>
+            <li><a href="/products">상품</a></li>
+            <li><a href="/about">소개</a></li>
+            <li><a href="/contact">문의</a></li>
+        </ul>
+    </nav>
+</header>
+
+<section class="breadcrumb">
+    <div class="container">
+        <nav class="breadcrumb-nav">
+            <a href="/">홈</a>
+            <span>></span>
+            <a href="/cart">장바구니</a>
+            <span>></span>
+            <span>결제하기</span>
         </nav>
-    </header>
+    </div>
+</section>
 
-    <!-- Breadcrumb -->
-    <section class="breadcrumb">
-        <div class="container">
-            <nav class="breadcrumb-nav">
-                <a href="/">홈</a>
-                <span>></span>
-                <a href="/cart">장바구니</a>
-                <span>></span>
-                <span>결제하기</span>
-            </nav>
-        </div>
-    </section>
-
-    <!-- Payment Section -->
-    <section class="payment-section">
-        <div class="container">
-            <div class="payment-container">
-                <!-- Payment Form -->
-                <div class="payment-form">
-                    <form action="/process-payment" method="POST">
-                        <!-- 주문자 정보 -->
-                        <div class="form-section">
-                            <h2 class="section-title">
-                                👤 주문자 정보
-                            </h2>
+<section class="payment-section">
+    <div class="container">
+        <div class="payment-container">
+            <div class="payment-form">
+                <form action="/process-payment" method="POST">
+                    <!-- 주문자 정보 -->
+                    <div class="form-section">
+                        <h2 class="section-title">👤 주문자 정보</h2>
+                        <div class="form-group">
+                            <label class="form-label" for="customer-name">이름 *</label>
+                            <input type="text" id="customer-name" name="customerName" class="form-input" value="<%= user.username %>" required>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label" for="customer-name">이름 *</label>
-                                <input type="text" id="customer-name" name="customerName" class="form-input" value="김철수" required>
+                                <label class="form-label" for="customer-phone">휴대폰 번호 *</label>
+                                <input type="tel" id="customer-phone" name="customerPhone" class="form-input" required>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label class="form-label" for="customer-phone">휴대폰 번호 *</label>
-                                    <input type="tel" id="customer-phone" name="customerPhone" class="form-input" value="010-1234-5678" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="customer-email">이메일</label>
-                                    <input type="email" id="customer-email" name="customerEmail" class="form-input" value="kim@example.com">
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label" for="customer-email">이메일</label>
+                                <input type="email" id="customer-email" name="customerEmail" class="form-input" value="<%= user.email %>">
                             </div>
                         </div>
+                    </div>
 
                         <!-- 배송 정보 -->
                         <div class="form-section">
@@ -558,56 +183,44 @@
                         </div>
 
                         <!-- 결제 버튼 -->
-                        <button type="submit" class="btn btn-primary">
-                            💳 결제하기 (89,000원)
-                        </button>
-                    </form>
+                    <button type="submit" class="btn btn-primary">
+                        💳 결제하기 (<%= totalPrice.toLocaleString() %>원)
+                    </button>
+                </form>
+            </div>
+
+            <!-- 주문 요약 -->
+            <div class="order-summary">
+                <h3 class="summary-title">주문 상품</h3>
+                <% items.forEach(item => { %>
+                <div class="product-item">
+                    <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image">
+                    <div class="product-details">
+                        <div class="product-name"><%= item.name %></div>
+                        <div class="product-options">수량: <%= item.quantity %>개</div>
+                        <div class="product-price"><%= (item.price * item.quantity).toLocaleString() %>원</div>
+                    </div>
                 </div>
+                <% }) %>
 
-                <!-- Order Summary -->
-                <div class="order-summary">
-                    <h3 class="summary-title">주문 상품</h3>
-                    
-                    <div class="product-item">
-                        <img src="https://via.placeholder.com/80x80" alt="상품 이미지" class="product-image">
-                        <div class="product-details">
-                            <div class="product-name">프리미엄 티셔츠</div>
-                            <div class="product-options">블랙 / L / 수량: 2개</div>
-                            <div class="product-price">59,000원</div>
-                        </div>
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>상품금액</span>
+                        <span><%= totalPrice.toLocaleString() %>원</span>
                     </div>
-
-                    <div class="product-item">
-                        <img src="https://via.placeholder.com/80x80" alt="상품 이미지" class="product-image">
-                        <div class="product-details">
-                            <div class="product-name">캐주얼 청바지</div>
-                            <div class="product-options">네이비 / 32 / 수량: 1개</div>
-                            <div class="product-price">30,000원</div>
-                        </div>
+                    <div class="price-row">
+                        <span>배송비</span>
+                        <span>무료</span>
                     </div>
-
-                    <div class="price-breakdown">
-                        <div class="price-row">
-                            <span>상품금액</span>
-                            <span>89,000원</span>
-                        </div>
-                        <div class="price-row">
-                            <span>배송비</span>
-                            <span>무료</span>
-                        </div>
-                        <div class="price-row">
-                            <span>할인금액</span>
-                            <span>-0원</span>
-                        </div>
-                        <div class="price-row total">
-                            <span>총 결제금액</span>
-                            <span>89,000원</span>
-                        </div>
+                    <div class="price-row total">
+                        <span>총 결제금액</span>
+                        <span><%= totalPrice.toLocaleString() %>원</span>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <script>
         // 카드번호 자동 하이픈 추가

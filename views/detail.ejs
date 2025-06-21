@@ -414,33 +414,45 @@
 
         // detail.ejs에서 "장바구니 담기" 시, 해당 옷의 type(또는 category, gender 등)을 localStorage에 저장
         function addToCart() {
-            const size = document.getElementById('selectedSize').textContent;
-            const quantity = document.getElementById('quantity').value;
-            const user_id = '<%= user ? user.id : "" %>';
-            const cloth_id = '<%= item.id %>';
-            const name = '<%= item.name %>';
-            const image_url = "<%= item.image_url %>";
+    const size = document.getElementById('selectedSize').textContent;
+    const quantity = document.getElementById('quantity').value;
+    const user_id = '<%= user ? user.id : "" %>';
+    const cloth_id = '<%= item.id %>';
+    const name = '<%= item.name %>';
+    const image_url = "<%= item.image_url %>";
 
-            fetch('/api/v1/cartgo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(cartData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showCartPopup();
-                } else {
-                    let reason = data.message || data.error || '알 수 없는 이유';
-                    alert('장바구니 담기에 실패했습니다.\n사유: ' + reason);
-                }
-            })
-            .catch((err) => {
-                alert('장바구니 요청 중 오류가 발생했습니다.\n' + (err.message || err));
-            });
+    const cartData = {
+        user_id,
+        cloth_id,
+        name,
+        image_url,
+        size,
+        quantity
+    };
+
+    console.log("보내는 데이터:", cartData);
+
+    fetch('/api/v1/cartgo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cartData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showCartPopup();
+        } else {
+            let reason = data.message || data.error || '알 수 없는 이유';
+            alert('장바구니 담기에 실패했습니다.\n사유: ' + reason);
         }
+    })
+    .catch((err) => {
+        alert('장바구니 요청 중 오류가 발생했습니다.\n' + (err.message || err));
+    });
+}
+
         
         // Buy now
         function buyNow() {

@@ -17,7 +17,7 @@ router.post('/detail', async (req, res) => {
         }
 
         const item = results[0];
-        const user = req.user || null; // 로그인 미들웨어에서 user를 req.user로 넣었다면
+        const user = req.session.user || null;
 
         // 🔻 유저가 로그인된 경우에만 장바구니 개수 조회
         let cartCount = 0;

@@ -18,14 +18,22 @@ router.post('/detail', async (req, res) => {
 
     const item = results[0];
     const user = req.session.user; // 세션에서 user 가져오기
+
+    // 🔻 유저가 로그인된 경우에만 장바구니 개수 조회
+    let cartCount = 0;
+    if (user && user.id) {
+      const [cartItems] = await db.query('SELECT COUNT(*) AS count FROM cart WHERE user_id = ?', [user.id]);
+      cartCount = cartItems[0].count;
+    }
+
     console.log('🎯🎯🎯🎯 상품 조회 성공:', item);
-    res.render('detail', { item, user }); // user 함께 전달
+    console.log('🛒🛒🛒 장바구니 개수:', cartCount);
+
+    res.render('detail', { item, user, cartCount }); // cartCount 전달!
   } catch (err) {
     console.error('❌ DB 오류:', err);
     res.status(500).send('DB 오류 발생');
   }
 });
-
-
 
 module.exports = router;

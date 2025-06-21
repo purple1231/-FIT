@@ -72,6 +72,8 @@ app.get('/test', (req, res) => res.render('test'));
 app.get('/users', (req, res) => res.render('users'));
 app.get('/apitest', (req, res) => res.render('apitest'));
 app.get('/mainImsi', (req, res) => res.render('mainImsi'));
+app.get('/payment', (req, res) => res.render('payment'));
+
 
 app.get('/home', (req, res) => {
   try {

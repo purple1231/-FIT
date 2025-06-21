@@ -8,14 +8,47 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/detail.css">
+    <style>
+        .cart-popup {
+        position: fixed;
+        bottom: -100px; /* 기본적으로 안 보이게 */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ff7f00;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        z-index: 9999;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        transition: bottom 0.3s ease-in-out;
+        }
+
+        .cart-popup.show {
+        bottom: 40px; /* 팝업이 올라옴 */
+        }
+
+        .cart-popup button {
+        background-color: white;
+        color: #ff7f00;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
     <header>
         <nav class="container">
-            <a href="#" class="logo">FIT AI 쇼핑몰</a>
+            <a href="/home" class="logo">FIT AI 쇼핑몰</a>
             <ul class="nav-links">
-                <li><a href="#">홈</a></li>
+                <li><a href="/home">홈</a></li>
                 <li><a href="#">카테고리</a></li>
                 <li><a href="#">베스트</a></li>
                 <li><a href="#">세일</a></li>
@@ -24,9 +57,9 @@
             <div class="nav-icons">
                 <a href="#"><i class="fas fa-search"></i></a>
                 <a href="#"><i class="fas fa-heart"></i></a>
-                <a href="#" id="cartIcon">
+                <a href="/cart" id="cartIcon">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">2</span>
+                    <span class="cart-count"><%= cartCount || 0 %></span>
                 </a>
                 <a href="#"><i class="fas fa-user"></i></a>
             </div>
@@ -207,6 +240,8 @@
 
                 <div class="tab-content" id="reviews">
                     <h3>고객 리뷰</h3>
+
+                    <!-- 기존 리뷰들 -->
                     <div class="review-item">
                         <div class="review-header">
                             <span class="reviewer-name">김**</span>
@@ -235,7 +270,30 @@
                         </div>
                         <p>사이즈가 딱 맞고 색상도 사진과 동일해요. 만족합니다.</p>
                     </div>
+
+                    <!-- ✍ 리뷰 작성 폼 -->
+                    <div class="review-form-wrapper" style="margin-top: 2rem; padding: 20px; border-top: 1px solid #ccc;">
+                        <h4 style="margin-bottom: 1rem;">리뷰 작성하기</h4>
+                        <form action="/api/v1/review" method="POST" enctype="multipart/form-data" class="review-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+                            <input type="hidden" name="cloth_id" value="<%= item.id %>">
+                            <input type="hidden" name="user_id" value="<%= user.id %>">
+
+                            <label for="rating">평점 (0~5):</label>
+                            <input type="number" name="rating" min="0" max="5" step="0.5" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+
+                            <label for="content">리뷰 내용:</label>
+                            <textarea name="content" rows="4" placeholder="리뷰를 작성해 주세요" required style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+
+                            <label for="image">리뷰 사진 첨부 (선택):</label>
+                            <input type="file" name="image" accept="image/*" style="padding: 8px;">
+
+                            <button type="submit" class="btn btn-primary" style="align-self: flex-start;">
+                                <i class="fas fa-pen"></i> 리뷰 등록
+                            </button>
+                        </form>
+                    </div>
                 </div>
+
 
                 <div class="tab-content" id="shipping">
                     <h3>배송 및 교환/반품 안내</h3>
@@ -385,7 +443,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('장바구니에 담겼습니다!');
+                    showCartPopup();
                 } else {
                     alert('장바구니 담기에 실패했습니다.');
                 }
@@ -499,10 +557,41 @@
             }
         });
 
+
+        function showCartPopup() {
+            const popup = document.getElementById('cartPopup');
+            popup.classList.add('show');
+
+            // 몇 초 후 자동 사라짐 (선택사항)
+            setTimeout(() => {
+            popup.classList.remove('show');
+            }, 8000); // 5초 후 자동 숨김
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }  
+        
+        
+        
+        
+        
+        
         
         
         
         </script>
+
+
+
+
+
+
+        <!-- ✅ 여기에 팝업 삽입 -->
+<div id="cartPopup" class="cart-popup">
+  <p>🛒 장바구니에 담겼습니다!</p>
+  <button onclick="goToCart()">장바구니로 이동</button>
+</div>
 </body>
 </html>
 </html>

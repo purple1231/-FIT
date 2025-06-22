@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session'); // 세션 관리 추가
+const db = require('./db/db');
 
 const app = express();
 
@@ -80,14 +81,46 @@ app.get('/mainImsi', (req, res) => res.render('mainImsi'));
 
 
 
-app.get('/home', (req, res) => {
+
+
+
+// 홈 페이지 렌더링
+// 로그인된 사용자만 접근 가능
+app.get('/home', async (req, res) => {
   try {
-    res.render('home'); // 또는: res.render('home', { user: {}, products: [] })
+    // 로그인 안 된 경우 접근 제한
+    if (!req.session.user) {
+      return res.status(401).send('로그인이 필요합니다');
+      // 또는: return res.redirect('/login');
+    }
+
+    const userId = req.session.user.id;
+
+    const [clothRows] = await db.query(`
+      SELECT * FROM cloth
+      WHERE id NOT IN (
+        SELECT cloth_id FROM cart WHERE user_id = ?
+      )
+    `, [userId]);
+      console.log("지금 아이템 목록:", clothRows);
+
+
+    res.render('home', {
+      user: req.session.user,
+      products: clothRows
+    });
   } catch (error) {
     console.error('홈 렌더링 에러:', error.message);
     res.status(500).send('서버 렌더링 오류 발생');
   }
 });
+
+
+
+
+
+
+
 
 app.get('/signup', (req, res) => {
   res.render('signup', {

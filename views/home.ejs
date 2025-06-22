@@ -491,29 +491,28 @@
     </section>
 
     <!-- 추천 상품 EJS 서버 렌더링 방식 -->
-<% if (typeof recommended !== 'undefined' && recommended && recommended.length > 0) { %>
-<script>
-    // recommended를 브라우저 콘솔에 출력
-    console.log('recommended:', <%- JSON.stringify(recommended) %>);
-</script>
-<section class="recommended-products">
-  <div class="container">
-    <h2 class="section-title">회원님을 위한 추천 상품</h2>
-    <div class="product-grid">
-      <% recommended.forEach(function(product) { %>
-        <div class="product-card" onclick="goToDetail(<%= product.id %>)" style="cursor:pointer;">
-          <img src="<%= product.image_url %>" alt="<%= product.name %>">
-          <div class="product-info">
-            <h3><%= product.name %></h3>
-            <div class="product-price"><%= Number(product.price).toLocaleString() %>원</div>
-            <button class="btn" onclick="event.stopPropagation(); addToCart(<%= product.id %>)">장바구니 담기</button>
-          </div>
+    <% 
+      // 상의 2개, 하의 2개 추출
+      const shirts = recommended.filter(p => p.type === 'shirt').slice(0, 2);
+      const pants = recommended.filter(p => p.type === 'pants').slice(0, 2);
+      const gridItems = [...shirts, ...pants];
+    %>
+    <% if (gridItems.length > 0) { %>
+    <section class="recommended-products">
+      <div class="container">
+        <h2 class="section-title">회원님을 위한 추천 상품</h2>
+        <div class="product-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <% gridItems.forEach(function(product) { %>
+            <div class="product-card" style="display:flex;align-items:center;justify-content:center;height:120px;">
+              <a href="<%= product.image_url %>" target="_blank" style="color:#333;text-decoration:underline;word-break:break-all;">
+                <%= product.image_url %>
+              </a>
+            </div>
+          <% }); %>
         </div>
-      <% }); %>
-    </div>
-  </div>
-</section>
-<% } %>
+      </div>
+    </section>
+    <% } %>
 
     <!-- Newsletter -->
     <section class="newsletter">

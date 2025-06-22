@@ -101,7 +101,6 @@ app.get("/home", async (req, res) => {
 
     // 사용자 정보 조회 (프로필 이미지 포함)
     const [userRows] = await db.execute("SELECT id, username, email, name, my_url FROM user WHERE id = ?", [userId])
-
     const user = userRows[0] || req.session.user
 
     // 장바구니 개수 조회
@@ -118,10 +117,10 @@ app.get("/home", async (req, res) => {
       [userId],
     )
 
-    // ✅ 랜덤 추천 2개 선택 (또는 앞 2개)
-    const recommended = clothRows
-      .sort(() => Math.random() - 0.5) // 랜덤 정렬
-      .slice(0, 2) // 2개만 선택
+    // ✅ 상의 2개, 하의 2개 추천
+    const shirts = clothRows.filter(item => item.type === 'shirt').slice(0, 2)
+    const pants = clothRows.filter(item => item.type === 'pants').slice(0, 2)
+    const recommended = [...shirts, ...pants]
 
     console.log("지금 아이템 목록:", clothRows)
     console.log("추천 상품:", recommended)
@@ -130,7 +129,7 @@ app.get("/home", async (req, res) => {
       user: user,
       cartCount: cartCount,
       products: clothRows,
-      recommended, // 🔥 뷰로 전달
+      recommended, // 🔥 4개 전달
     })
   } catch (error) {
     console.error("홈 렌더링 에러:", error.message)

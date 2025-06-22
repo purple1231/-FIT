@@ -131,9 +131,10 @@ app.get("/home", async (req, res) => {
       clothRows = clothResult || []
 
     // ✅ 상의 2개, 하의 2개 추천
-    const shirts = clothRows.filter(item => item.type === 'shirt').slice(0, 2)
-    const pants = clothRows.filter(item => item.type === 'pants').slice(0, 2)
-    const recommended = [...shirts, ...pants]
+    const shuffledShirts = clothRows.filter(item => item.type === 'shirt').sort(() => Math.random() - 0.5)
+    const shuffledPants = clothRows.filter(item => item.type === 'pants').sort(() => Math.random() - 0.5)
+    recommended = [...shuffledShirts.slice(0, 2), ...shuffledPants.slice(0, 2)]
+
 
       console.log("👕 상품 개수:", clothRows.length) // 디버깅용
       console.log("⭐ 추천 상품 다출력:", recommended) // 디버깅용

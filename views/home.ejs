@@ -66,12 +66,38 @@
         .nav-icons {
             display: flex;
             gap: 1rem;
+            align-items: center;
         }
 
         .nav-icons a {
             text-decoration: none;
             color: #333;
             font-size: 1.2rem;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .profile-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e74c3c;
         }
 
         /* Hero Section */
@@ -139,12 +165,23 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            transition: all 0.3s;
             cursor: pointer;
+            border: 3px solid transparent;
         }
 
         .category-card:hover {
             transform: translateY(-5px);
+        }
+
+        .category-card.active {
+            border-color: #e74c3c;
+            background: #e74c3c;
+            color: white;
+        }
+
+        .category-card.active h3 {
+            color: white;
         }
 
         .category-card img {
@@ -157,6 +194,7 @@
             padding: 1rem;
             text-align: center;
             font-size: 1.3rem;
+            transition: color 0.3s;
         }
 
         /* Featured Products */
@@ -399,8 +437,19 @@
                 <li><a href="#contact">연락처</a></li>
             </ul>
             <div class="nav-icons">
-                <a href="#" onclick="toggleCart()">🛒 <span id="cart-count">0</span></a>
-                <a href="#">👤</a>
+                <a href="/cart" id="cart-link">
+                    🛒 
+                    <% if (cartCount > 0) { %>
+                        <span class="cart-count"><%= cartCount %></span>
+                    <% } %>
+                </a>
+                <a href="/mypage">
+                    <% if (user && user.my_url) { %>
+                        <img src="/<%= user.my_url %>" alt="프로필" class="profile-icon">
+                    <% } else { %>
+                        👤
+                    <% } %>
+                </a>
             </div>
         </nav>
     </header>
@@ -419,21 +468,13 @@
         <div class="container">
             <h2 class="section-title">카테고리</h2>
             <div class="category-grid">
-                <div class="category-card" onclick="filterProducts('men')">
-                    <img src="/placeholder.svg?height=200&width=250" alt="남성복">
-                    <h3>남성복</h3>
+                <div class="category-card" id="top-category" onclick="filterProducts('상의')">
+                    <img src="/placeholder.svg?height=200&width=250" alt="상의">
+                    <h3>상의</h3>
                 </div>
-                <div class="category-card" onclick="filterProducts('women')">
-                    <img src="/placeholder.svg?height=200&width=250" alt="여성복">
-                    <h3>여성복</h3>
-                </div>
-                <div class="category-card" onclick="filterProducts('accessories')">
-                    <img src="/placeholder.svg?height=200&width=250" alt="액세서리">
-                    <h3>액세서리</h3>
-                </div>
-                <div class="category-card" onclick="filterProducts('shoes')">
-                    <img src="/placeholder.svg?height=200&width=250" alt="신발">
-                    <h3>신발</h3>
+                <div class="category-card" id="bottom-category" onclick="filterProducts('하의')">
+                    <img src="/placeholder.svg?height=200&width=250" alt="하의">
+                    <h3>하의</h3>
                 </div>
             </div>
         </div>
@@ -549,70 +590,133 @@
     </div>
 
     <script>
-             // Sample product data
+        // Sample product data
+        let products = []; // 전역에서 사용할 DB 기반 상품 목록
+        let cart = [];
+        let currentFilter = 'all';
 
-            let products = []; // 전역에서 사용할 DB 기반 상품 목록
-            let cart = [];
-            let currentFilter = 'all';
+        // 상품 로드 함수
+        async function loadProducts(filter = 'all') {
+            const productGrid = document.getElementById('product-grid');
+            try {
+                const res = await fetch('/api/v1/cloth');
+                products = await res.json();
 
-            // 상품 로드 함수
-            async function loadProducts(filter = 'all') {
-                const productGrid = document.getElementById('product-grid');
-                try {
-                    const res = await fetch('/api/v1/cloth');
-                    products = await res.json(); // ← 전역 변수에 저장
+                // 콘솔에 cloth 테이블 데이터 출력
+                console.log('cloth 테이블에서 받아온 상품 데이터:', products);
 
-                    // 콘솔에 cloth 테이블 데이터 출력
-                    console.log('cloth 테이블에서 받아온 상품 데이터:', products);
+                // type으로 필터링 (shirt/pants)
+                const filteredProducts = filter === 'all' 
+                    ? products 
+                    : products.filter(p => p.type === filter);
 
-                    // gender로 필터링
-                    const filteredProducts = filter === 'all' 
-                        ? products 
-                        : products.filter(p => p.gender === filter);
-
-                    productGrid.innerHTML = filteredProducts.map(product => `
-    <div class="product-card" onclick="goToDetail(${product.id})" style="cursor:pointer;">
-        <img src="${product.image_url}" alt="${product.name}">
-        <div class="product-info">
-            <h3>${product.name}</h3>
-            <div class="product-price">
-                ${Number(product.price).toLocaleString()}원
-            </div>
-            <button class="btn" onclick="event.stopPropagation(); addToCart(${product.id})">장바구니 담기</button>
-        </div>
-    </div>
-`).join('');
-                } catch (err) {
-                    productGrid.innerHTML = '<p>상품을 불러오는 데 실패했습니다.</p>';
-                    console.error(err);
-                }
+                productGrid.innerHTML = filteredProducts.map(product => `
+                    <div class="product-card" onclick="goToDetail(${product.id})" style="cursor:pointer;">
+                        <img src="${product.image_url}" alt="${product.name}">
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <div class="product-price">
+                                ${Number(product.price).toLocaleString()}원
+                            </div>
+                            <button class="btn" onclick="event.stopPropagation(); addToCart(${product.id})">장바구니 담기</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                productGrid.innerHTML = '<p>상품을 불러오는 데 실패했습니다.</p>';
+                console.error(err);
             }
-
+        }
 
         // Filter products
         function filterProducts(category) {
-            currentFilter = category;
-            loadProducts(category);
+            // 카테고리 버튼 상태 업데이트
+            const topCategory = document.getElementById('top-category');
+            const bottomCategory = document.getElementById('bottom-category');
+            
+            // 모든 카테고리 버튼 초기화
+            topCategory.classList.remove('active');
+            bottomCategory.classList.remove('active');
+            
+            // 카테고리 매핑 (한국어 -> 영어)
+            const categoryMap = {
+                '상의': 'shirt',
+                '하의': 'pants'
+            };
+            
+            const dbCategory = categoryMap[category];
+            
+            if (currentFilter === category) {
+                // 같은 카테고리를 다시 클릭하면 전체 보기
+                currentFilter = 'all';
+                loadProducts('all');
+            } else {
+                // 새로운 카테고리 선택
+                currentFilter = category;
+                loadProducts(dbCategory); // DB의 실제 type 값 사용
+                
+                // 선택된 카테고리 버튼 활성화
+                if (category === '상의') {
+                    topCategory.classList.add('active');
+                } else if (category === '하의') {
+                    bottomCategory.classList.add('active');
+                }
+            }
         }
 
         // Add to cart
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            const existingItem = cart.find(item => item.id === productId);
+        async function addToCart(productId) {
+            try {
+                const response = await fetch('/api/v1/gotoCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        clothId: productId,
+                        quantity: 1 
+                    })
+                });
 
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({...product, quantity: 1});
+                if (response.ok) {
+                    alert('장바구니에 추가되었습니다!');
+                    // 장바구니 개수 업데이트
+                    updateCartCount();
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || '장바구니 추가에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('장바구니 추가 오류:', error);
+                alert('장바구니 추가 중 오류가 발생했습니다.');
             }
-            // localStorage에 최근 담은 상품 정보 저장 (최대 3개)
-            let recent = JSON.parse(localStorage.getItem('recentCart') || '[]');
-            recent = recent.filter(item => item.id !== product.id);
-            recent.unshift({ id: product.id, category: product.category, gender: product.gender });
-            if (recent.length > 3) recent = recent.slice(0, 3);
-            localStorage.setItem('recentCart', JSON.stringify(recent));
+        }
 
-            updateCartUI();
+        // 장바구니 개수 업데이트
+        async function updateCartCount() {
+            try {
+                const response = await fetch('/api/v1/cart-count');
+                if (response.ok) {
+                    const data = await response.json();
+                    const cartLink = document.getElementById('cart-link');
+                    
+                    // 기존 cart-count 제거
+                    const existingCount = cartLink.querySelector('.cart-count');
+                    if (existingCount) {
+                        existingCount.remove();
+                    }
+                    
+                    // 새로운 cart-count 추가
+                    if (data.count > 0) {
+                        const countSpan = document.createElement('span');
+                        countSpan.className = 'cart-count';
+                        countSpan.textContent = data.count;
+                        cartLink.appendChild(countSpan);
+                    }
+                }
+            } catch (error) {
+                console.error('장바구니 개수 조회 오류:', error);
+            }
         }
 
         // Update cart UI
@@ -691,26 +795,27 @@
         });
 
         // 상세 페이지 이동 함수 추가
-function goToDetail(itemId) {
-    // form 생성
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/api/v1/detail';
+        function goToDetail(itemId) {
+            // form 생성
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/v1/detail';
 
-    // itemId input 추가
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'itemId';
-    input.value = itemId;
-    form.appendChild(input);
+            // itemId input 추가
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'itemId';
+            input.value = itemId;
+            form.appendChild(input);
 
-    document.body.appendChild(form);
-    form.submit();
-}
+            document.body.appendChild(form);
+            form.submit();
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
+            updateCartCount(); // 장바구니 개수 초기화
         });
     </script>
 </body>

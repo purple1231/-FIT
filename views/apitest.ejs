@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Try-On Diffusion</title>
+  <link rel="stylesheet" href="/style.css"> <!-- 선택 사항 -->
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+    form {
+      margin-bottom: 2rem;
+    }
+    input[type="file"] {
+      display: block;
+      margin: 1rem 0;
+    }
+    .preview {
+      display: flex;
+      gap: 1rem;
+    }
+    .preview img {
+      max-height: 200px;
+      border: 1px solid #ccc;
+    }
+    .result-image {
+      margin-top: 2rem;
+    }
+    .result-image img {
+      max-width: 100%;
+      border: 2px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>가상 피팅 - Try-On</h1>
+
+  <form id="tryonForm" enctype="multipart/form-data">
+    <label>Avatar 이미지 (사람 이미지):</label>
+    <input type="file" name="avatar_image" accept="image/*" required>
+
+    <label>Clothing 이미지 (의류 이미지):</label>
+    <input type="file" name="clothing_image" accept="image/*" required>
+
+    <button type="submit">시도해보기</button>
+  </form>
+
+  <div class="result-image" id="resultSection" style="display:none;">
+    <h2>결과 이미지:</h2>
+    <img id="resultImg" src="" alt="Try-On 결과">
+  </div>
+
+  <script>
+    const form = document.getElementById('tryonForm');
+    const resultSection = document.getElementById('resultSection');
+    const resultImg = document.getElementById('resultImg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/api/v1/tryon', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('이미지 생성 실패');
+
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+
+        resultImg.src = imageUrl;
+        resultSection.style.display = 'block';
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

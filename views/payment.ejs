@@ -1,0 +1,280 @@
+<!-- 예시: EJS를 사용한 결제 페이지 템플릿 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제하기 - ShopMall</title>
+    <link rel="stylesheet" href="/payment.css"> <!-- CSS는 외부로 분리된 상태 -->
+</head>
+<body>
+<header>
+    <nav class="container">
+        <a href="/" class="logo">ShopMall</a>
+        <ul class="nav-links">
+            <li><a href="/">홈</a></li>
+            <li><a href="/products">상품</a></li>
+            <li><a href="/about">소개</a></li>
+            <li><a href="/contact">문의</a></li>
+        </ul>
+    </nav>
+</header>
+
+<section class="breadcrumb">
+    <div class="container">
+        <nav class="breadcrumb-nav">
+            <a href="/">홈</a>
+            <span>></span>
+            <a href="/cart">장바구니</a>
+            <span>></span>
+            <span>결제하기</span>
+        </nav>
+    </div>
+</section>
+
+<section class="payment-section">
+    <div class="container">
+        <div class="payment-container">
+            <div class="payment-form">
+                
+                <form action="/api/v1/end" method="post">
+
+
+
+
+
+                    <!-- items 정보를 hidden input으로 JSON 직렬화하여 전송 -->
+
+                    <input type="hidden" name="itemsJson" value='<%= JSON.stringify(items) %>'>
+
+
+
+
+
+
+                    <!-- 주문자 정보 -->
+                    <div class="form-section">
+                        <h2 class="section-title">👤 주문자 정보</h2>
+                        <div class="form-group">
+                            <label class="form-label" for="customer-name">이름 *</label>
+                            <input type="text" id="customer-name" name="customerName" class="form-input" value="<%= user.username %>" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="customer-phone">휴대폰 번호 *</label>
+                                <input type="tel" id="customer-phone" name="customerPhone" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="customer-email">이메일</label>
+                                <input type="email" id="customer-email" name="customerEmail" class="form-input" value="<%= user.email %>">
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- 배송 정보 -->
+                        <div class="form-section">
+                            <h2 class="section-title">
+                                🚚 배송 정보
+                            </h2>
+                            <div class="form-group">
+                                <label class="form-label" for="recipient-name">받는 분 이름 *</label>
+                                <input type="text" id="recipient-name" name="recipientName" class="form-input" value="김철수" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="recipient-phone">받는 분 휴대폰 *</label>
+                                <input type="tel" id="recipient-phone" name="recipientPhone" class="form-input" value="010-1234-5678" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="postal-code">우편번호 *</label>
+                                    <input type="text" id="postal-code" name="postalCode" class="form-input" value="12345" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary">주소 검색</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="address">주소 *</label>
+                                <input type="text" id="address" name="address" class="form-input" value="서울특별시 강남구 테헤란로 123" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="address-detail">상세주소</label>
+                                <input type="text" id="address-detail" name="addressDetail" class="form-input" value="456호" placeholder="동, 호수 등 상세주소를 입력하세요">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="delivery-memo">배송 메모</label>
+                                <select id="delivery-memo" name="deliveryMemo" class="form-select">
+                                    <option value="">배송 메모를 선택하세요</option>
+                                    <option value="door">문 앞에 놓아주세요</option>
+                                    <option value="security">경비실에 맡겨주세요</option>
+                                    <option value="call">배송 전 연락주세요</option>
+                                    <option value="direct">직접 받겠습니다</option>
+                                    <option value="custom">직접 입력</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 결제 방법 -->
+                        <div class="form-section">
+                            <h2 class="section-title">
+                                💳 결제 방법
+                            </h2>
+                            <div class="payment-methods">
+                                <div>
+                                    <input type="radio" id="card" name="paymentMethod" value="card" class="payment-method" checked>
+                                    <label for="card" class="payment-method-label">
+                                        <div class="payment-icon">💳</div>
+                                        <div>신용카드</div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="bank" name="paymentMethod" value="bank" class="payment-method">
+                                    <label for="bank" class="payment-method-label">
+                                        <div class="payment-icon">🏦</div>
+                                        <div>무통장입금</div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="kakao" name="paymentMethod" value="kakao" class="payment-method">
+                                    <label for="kakao" class="payment-method-label">
+                                        <div class="payment-icon">💬</div>
+                                        <div>카카오페이</div>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="naver" name="paymentMethod" value="naver" class="payment-method">
+                                    <label for="naver" class="payment-method-label">
+                                        <div class="payment-icon">🟢</div>
+                                        <div>네이버페이</div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 신용카드 정보 (기본 선택) -->
+                            <div id="card-info">
+                                <div class="form-group">
+                                    <label class="form-label" for="card-number">카드번호 *</label>
+                                    <input type="text" id="card-number" name="cardNumber" class="form-input" placeholder="1234-5678-9012-3456" maxlength="19">
+                                </div>
+                                <div class="form-row-3">
+                                    <div class="form-group">
+                                        <label class="form-label" for="card-expiry">유효기간 *</label>
+                                        <input type="text" id="card-expiry" name="cardExpiry" class="form-input" placeholder="MM/YY" maxlength="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="card-cvc">CVC *</label>
+                                        <input type="text" id="card-cvc" name="cardCvc" class="form-input" placeholder="123" maxlength="3">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="card-password">카드 비밀번호</label>
+                                        <input type="password" id="card-password" name="cardPassword" class="form-input" placeholder="앞 2자리" maxlength="2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 약관 동의 -->
+                        <div class="form-section">
+                            <h2 class="section-title">
+                                📋 약관 동의
+                            </h2>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="agree-all" name="agreeAll">
+                                <label for="agree-all">전체 약관에 동의합니다</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="agree-terms" name="agreeTerms" required>
+                                <label for="agree-terms">이용약관 동의 (필수)</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="agree-privacy" name="agreePrivacy" required>
+                                <label for="agree-privacy">개인정보 처리방침 동의 (필수)</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="agree-marketing" name="agreeMarketing">
+                                <label for="agree-marketing">마케팅 정보 수신 동의 (선택)</label>
+                            </div>
+                        </div>
+
+                        <!-- 결제 버튼 -->
+                    <button type="submit" class="btn btn-primary">
+                        💳 결제하기 (<%= totalPrice.toLocaleString() %>원)
+                    </button>
+                </form>
+            </div>
+
+            <!-- 주문 요약 -->
+            <div class="order-summary">
+                <h3 class="summary-title">주문 상품</h3>
+                <% items.forEach(item => { %>
+                <div class="product-item">
+                    <img src="<%= item.image %>" alt="<%= item.name %>" class="product-image">
+                    <div class="product-details">
+                        <div class="product-name"><%= item.name %></div>
+                        <div class="product-options">수량: <%= item.quantity %>개</div>
+                        <div class="product-price"><%= (item.price * item.quantity).toLocaleString() %>원</div>
+                    </div>
+                </div>
+                <% }) %>
+
+                <div class="price-breakdown">
+                    <div class="price-row">
+                        <span>상품금액</span>
+                        <span><%= totalPrice.toLocaleString() %>원</span>
+                    </div>
+                    <div class="price-row">
+                        <span>배송비</span>
+                        <span>무료</span>
+                    </div>
+                    <div class="price-row total">
+                        <span>총 결제금액</span>
+                        <span><%= totalPrice.toLocaleString() %>원</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <script>
+        // 카드번호 자동 하이픈 추가
+        document.getElementById('card-number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1-');
+            if (formattedValue.length <= 19) {
+                e.target.value = formattedValue;
+            }
+        });
+
+        // 유효기간 자동 슬래시 추가
+        document.getElementById('card-expiry').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // 전체 약관 동의 체크박스
+        document.getElementById('agree-all').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:not(#agree-all)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // 결제 방법 변경 시 카드 정보 표시/숨김
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const cardInfo = document.getElementById('card-info');
+                if (this.value === 'card') {
+                    cardInfo.style.display = 'block';
+                } else {
+                    cardInfo.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

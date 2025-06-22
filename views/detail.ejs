@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= item.name %> - ShopMall</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/detail.css">
+    <style>
+        .cart-popup {
+        position: fixed;
+        bottom: -100px; /* 기본적으로 안 보이게 */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ff7f00;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        z-index: 9999;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        transition: bottom 0.3s ease-in-out;
+        }
+
+        .cart-popup.show {
+        bottom: 40px; /* 팝업이 올라옴 */
+        }
+
+        .cart-popup button {
+        background-color: white;
+        color: #ff7f00;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="/home" class="logo">FIT AI 쇼핑몰</a>
+            <ul class="nav-links">
+                <li><a href="/home">홈</a></li>
+                <li><a href="#">카테고리</a></li>
+                <li><a href="#">베스트</a></li>
+                <li><a href="#">세일</a></li>
+                <li><a href="#">브랜드</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#"><i class="fas fa-search"></i></a>
+                <a href="#"><i class="fas fa-heart"></i></a>
+                <a href="/cart" id="cartIcon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count"><%= cartCount || 0 %></span>
+                </a>
+                <a href="#"><i class="fas fa-user"></i></a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <section class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav">
+                <a href="#">홈</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#">의류</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="#"><%= item.type %></a>
+                <i class="fas fa-chevron-right"></i>
+                <span><%= item.name %></span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Product Detail -->
+    <section class="product-detail">
+        <div class="container">
+            <div class="product-container">
+                <!-- Product Images -->
+                <div class="product-images">
+                    <img src="<%= item.image_url %>" alt="<%= item.name %>" class="main-image" id="mainImage">
+                    <div class="thumbnail-images">
+                        <img src="<%= item.image_url %>" alt="썸네일 1" class="thumbnail active" onclick="changeMainImage(this)">
+                        <img src="https://source.unsplash.com/500x500?knitwear" alt="썸네일 2" class="thumbnail" onclick="changeMainImage(this)">
+                        <img src="https://source.unsplash.com/500x500?wool" alt="썸네일 3" class="thumbnail" onclick="changeMainImage(this)">
+                        <img src="https://source.unsplash.com/500x500?fashion" alt="썸네일 4" class="thumbnail" onclick="changeMainImage(this)">
+                    </div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-info">
+                    <h1 class="product-title"><%= item.name %></h1>
+                    
+                    <div class="product-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="rating-text">4.5 (128 리뷰)</span>
+                    </div>
+
+                    <div class="product-price">
+                        <span class="current-price"><%= item.price.toLocaleString() %>원</span>
+                        <% if (item.original_price) { %>
+                            <span class="original-price"><%= item.original_price.toLocaleString() %>원</span>
+                            <% const discount = Math.round((1 - item.price / item.original_price) * 100); %>
+                            <span class="discount-badge"><%= discount %>% 할인</span>
+                        <% } %>
+                    </div>
+
+                    <div class="product-options">
+                        <!-- Color Selection -->
+                        <div class="option-group">
+                            <label class="option-label">색상 선택</label>
+                            <div class="color-options">
+                                <div class="color-option color-black active" data-color="블랙" onclick="selectColor(this)"></div>
+                                <div class="color-option color-white" data-color="화이트" onclick="selectColor(this)"></div>
+                                <div class="color-option color-gray" data-color="그레이" onclick="selectColor(this)"></div>
+                                <div class="color-option color-navy" data-color="네이비" onclick="selectColor(this)"></div>
+                            </div>
+                            <p>선택된 색상: <span id="selectedColor">블랙</span></p>
+                        </div>
+
+                        <!-- Size Selection -->
+                        <div class="option-group">
+                            <label class="option-label">사이즈 선택</label>
+                            <div class="size-options">
+                                <div class="size-option" data-size="XS" onclick="selectSize(this)">XS</div>
+                                <div class="size-option" data-size="S" onclick="selectSize(this)">S</div>
+                                <div class="size-option active" data-size="M" onclick="selectSize(this)">M</div>
+                                <div class="size-option" data-size="L" onclick="selectSize(this)">L</div>
+                                <div class="size-option" data-size="XL" onclick="selectSize(this)">XL</div>
+                                <div class="size-option disabled" data-size="XXL">XXL (품절)</div>
+                            </div>
+                            <a href="#" class="size-guide">사이즈 가이드 <i class="fas fa-ruler"></i></a>
+                            <p>선택된 사이즈: <span id="selectedSize">M</span></p>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="option-group">
+                            <label class="option-label">수량</label>
+                            <div class="quantity-selector">
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn" onclick="changeQuantity(-1)">-</button>
+                                    <input type="number" class="quantity-input" value="1" min="1" max="10" id="quantity">
+                                    <button class="quantity-btn" onclick="changeQuantity(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Try-On Section -->
+                    <div class="ai-try-on">
+                        <h3><i class="fas fa-magic"></i> AI 가상 피팅</h3>
+                        <p>내 사진에 이 옷을 가상으로 입어보세요!</p>
+                        <button class="btn btn-ai" onclick="openAIModal()">
+                            <i class="fas fa-camera"></i> AI 옷입히기
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-wishlist" onclick="toggleWishlist()">
+                            <i class="far fa-heart" id="wishlistIcon"></i>
+                        </button>
+                        <button class="btn btn-secondary" onclick="addToCart()">
+                            <i class="fas fa-shopping-cart"></i> 장바구니
+                        </button>
+                        <button class="btn btn-primary" onclick="buyNow()">
+                            <i class="fas fa-bolt"></i> 바로구매
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Tabs -->
+            <div class="product-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('description')">상품설명</button>
+                    <button class="tab-btn" onclick="showTab('reviews')">리뷰 (<%= reviews.length %>)</button>
+                    <button class="tab-btn" onclick="showTab('shipping')">배송/교환</button>
+                    <button class="tab-btn" onclick="showTab('qna')">Q&A</button>
+                </div>
+
+                <div class="tab-content active" id="description">
+                    <h3>상품 상세 정보</h3>
+                    <p><%= item.description %></p>
+                    <br>
+                    <h4>소재 및 관리법</h4>
+                    <ul>
+                        <li>소재: <%= item.material || '울 70%, 캐시미어 20%, 나일론 10%' %></li>
+                        <li>세탁: <%= item.washing_method || '드라이클리닝 권장' %></li>
+                        <li>보관: <%= item.storage_method || '통풍이 잘 되는 곳에 보관' %></li>
+                    </ul>
+                    <br>
+                    <h4>사이즈 정보</h4>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 10px; border: 1px solid #ddd;">사이즈</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">어깨너비</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">가슴둘레</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">소매길이</th>
+                            <th style="padding: 10px; border: 1px solid #ddd;">총길이</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">S</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">42cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">96cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">58cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">62cm</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">M</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">44cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">100cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">60cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">64cm</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">L</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">46cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">104cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">62cm</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">66cm</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="tab-content" id="reviews">
+                    <h3>고객 ai 착샷 리뷰</h3>
+
+                    <!-- 기존 리뷰들 -->
+                    <% if (reviews && reviews.length > 0) { %>
+                    <% reviews.forEach(review => { %>
+                        <div class="review-item">
+                        <div class="review-header">
+                            <span class="reviewer-name"><%= review.username.slice(0, 1) %>**</span>
+                            <span class="review-date"><%= new Date(review.created_at).toISOString().split('T')[0] %></span>
+                        </div>
+                        <div class="review-rating">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                            <% if (i <= review.rating) { %>
+                                <i class="fas fa-star"></i>
+                            <% } else { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                            <% } %>
+                        </div>
+                        <% if (review.ai_image_url) { %>
+                            <div style="margin: 10px 0;">
+                            <img src="<%= review.ai_image_url %>" alt="AI 착샷" style="max-width: 250px; border: 1px solid #ccc; border-radius: 6px;">
+                            </div>
+                        <% } %>
+                        <p><%= review.content || '' %></p>
+                        </div>
+                    <% }); %>
+                    <% } else { %>
+                        <p style="color: gray;">아직 등록된 리뷰가 없습니다.</p>
+                    <% } %>
+
+
+                    <!-- ✍ 리뷰 작성 폼 -->
+                    <!-- ✍ 다른 사람들의 AI 착샷 보기 -->
+                    <!-- ✍ 다른 사람들의 AI 착샷 보기 -->
+                    <!-- ✍ 리뷰 작성 폼 -->
+                    <% if (canReview) { %>
+                    <div class="review-form-wrapper">
+                        <h4 class="review-title">🧍 다른 사람들의 AI 착샷 공유</h4>
+
+                        <!-- ✅ 내 AI 착샷 미리보기 -->
+                        <% if (myTryonImage) { %>
+                            <div class="my-tryon-preview">
+                                <p class="preview-label">내 AI 착샷 미리보기 👕</p>
+                                <div class="image-container">
+                                    <img src="<%= myTryonImage %>" alt="내 AI 착샷" class="tryon-image">
+                                    <div class="image-overlay">
+                                        <span class="overlay-text">AI 착샷</span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <form action="/api/v1/review" method="POST" enctype="multipart/form-data" class="review-form">
+                            <input type="hidden" name="cloth_id" value="<%= item.id %>">
+                            <input type="hidden" name="user_id" value="<%= user ? user.id : '' %>">
+                            <input type="hidden" name="ai_image_url" value="<%= myTryonImage %>">
+
+                            <!-- 별점 선택 -->
+                            <div class="form-group">
+                                <label class="form-label">평점을 선택해주세요</label>
+                                <div class="star-rating">
+                                    <input type="radio" name="rating" value="5" id="star5">
+                                    <label for="star5" class="star">★</label>
+                                    <input type="radio" name="rating" value="4" id="star4">
+                                    <label for="star4" class="star">★</label>
+                                    <input type="radio" name="rating" value="3" id="star3">
+                                    <label for="star3" class="star">★</label>
+                                    <input type="radio" name="rating" value="2" id="star2">
+                                    <label for="star2" class="star">★</label>
+                                    <input type="radio" name="rating" value="1" id="star1">
+                                    <label for="star1" class="star">★</label>
+                                </div>
+                                <div class="rating-text">별을 클릭해서 평점을 매겨주세요</div>
+                            </div>
+
+                            <!-- 리뷰 내용 -->
+                            <div class="form-group">
+                                <label for="content" class="form-label">한줄 느낌 또는 AI 착샷 설명 (선택)</label>
+                                <div class="textarea-wrapper">
+                                    <textarea name="content" id="content" rows="4" placeholder="예: 팔 길이가 좀 짧게 나왔어요! AI 착샷이 실제와 비슷해요!" class="styled-textarea"></textarea>
+                                    <div class="textarea-border"></div>
+                                </div>
+                            </div>
+
+                            <!-- 실제 착샷 첨부 -->
+                            <div class="form-group">
+                                <label for="real_image" class="form-label">실제 착샷 첨부 (선택)</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="real_image" id="real_image" accept="image/*" class="file-input">
+                                    <label for="real_image" class="file-upload-label">
+                                        <div class="upload-icon">📷</div>
+                                        <div class="upload-text">
+                                            <span class="upload-main">사진 선택하기</span>
+                                            <span class="upload-sub">실제 착용 사진을 업로드해주세요</span>
+                                        </div>
+                                    </label>
+                                    <div class="file-preview" id="filePreview"></div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">🚀</span>
+                                <span class="btn-text">AI 착샷 공유하기</span>
+                                <div class="btn-shine"></div>
+                            </button>
+                        </form>
+                    </div>
+                    <% } else { %>
+                    <div class="review-form-wrapper disabled">
+                        <div class="disabled-message">
+                            <div class="disabled-icon">⚠️</div>
+                            <p class="disabled-text">AI 착샷 공유는 해당 상품을 구매한 사용자만 가능합니다.</p>
+                            <div class="disabled-decoration"></div>
+                        </div>
+                    </div>
+                    <% } %>
+                        
+
+
+                </div>
+
+
+                <div class="tab-content" id="shipping">
+                    <h3>배송 및 교환/반품 안내</h3>
+                    <h4>배송 정보</h4>
+                    <ul>
+                        <li>배송비: 무료 (5만원 이상 구매시)</li>
+                        <li>배송기간: 주문 후 1-3일 (영업일 기준)</li>
+                        <li>배송지역: 전국 (제주도, 도서산간 지역 추가 배송비)</li>
+                    </ul>
+                    <br>
+                    <h4>교환/반품 안내</h4>
+                    <ul>
+                        <li>교환/반품 기간: 상품 수령 후 7일 이내</li>
+                        <li>교환/반품 비용: 고객 변심시 왕복 배송비 고객 부담</li>
+                        <li>교환/반품 불가: 착용 흔적이 있는 경우, 세탁한 경우</li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="qna">
+                    <h3>상품 문의</h3>
+                    <p>상품에 대한 궁금한 점이 있으시면 언제든지 문의해 주세요.</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">문의하기</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Try-On Modal -->
+    <div class="modal" id="aiModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-magic"></i> AI 가상 피팅</h2>
+                <button class="close-modal" onclick="closeAIModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3>사진을 업로드하세요</h3>
+                    <p>전신 사진을 업로드하면 AI가 이 옷을 입혀드립니다</p>
+                    <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileUpload(event)">
+                </div>
+                <div class="preview-container" id="previewContainer">
+                    <img id="previewImage" class="preview-image" alt="미리보기">
+                    <button class="btn btn-primary" onclick="processAI()">
+                        <i class="fas fa-magic"></i> AI 처리 시작
+                    </button>
+                </div>
+                <div id="aiResult" style="display: none; text-align: center; margin-top: 2rem;">
+                    <h3>AI 처리 완료!</h3>
+                    <p>가상 피팅 결과입니다.</p>
+                    <button class="btn btn-secondary" onclick="downloadResult()">
+                        <i class="fas fa-download"></i> 결과 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image gallery
+        function changeMainImage(thumbnail) {
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            
+            mainImage.src = thumbnail.src;
+            thumbnails.forEach(thumb => thumb.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+
+        // Color selection
+        function selectColor(colorOption) {
+            const colorOptions = document.querySelectorAll('.color-option');
+            const selectedColorSpan = document.getElementById('selectedColor');
+            
+            colorOptions.forEach(option => option.classList.remove('active'));
+            colorOption.classList.add('active');
+            selectedColorSpan.textContent = colorOption.dataset.color;
+        }
+
+        // Size selection
+        function selectSize(sizeOption) {
+            if (sizeOption.classList.contains('disabled')) return;
+            
+            const sizeOptions = document.querySelectorAll('.size-option:not(.disabled)');
+            const selectedSizeSpan = document.getElementById('selectedSize');
+            
+            sizeOptions.forEach(option => option.classList.remove('active'));
+            sizeOption.classList.add('active');
+            selectedSizeSpan.textContent = sizeOption.dataset.size;
+        }
+
+        // Quantity control
+        function changeQuantity(change) {
+            const quantityInput = document.getElementById('quantity');
+            let currentValue = parseInt(quantityInput.value);
+            let newValue = currentValue + change;
+            
+            if (newValue >= 1 && newValue <= 10) {
+                quantityInput.value = newValue;
+            }
+        }
+
+        // Wishlist toggle
+        function toggleWishlist() {
+            const wishlistIcon = document.getElementById('wishlistIcon');
+            if (wishlistIcon.classList.contains('far')) {
+                wishlistIcon.classList.remove('far');
+                wishlistIcon.classList.add('fas');
+                alert('찜 목록에 추가되었습니다!');
+            } else {
+                wishlistIcon.classList.remove('fas');
+                wishlistIcon.classList.add('far');
+                alert('찜 목록에서 제거되었습니다!');
+            }
+        }
+
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 파일 업로드 미리보기
+            const fileInput = document.getElementById('real_image');
+            const filePreview = document.getElementById('filePreview');
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            filePreview.innerHTML = `
+                                <div style="margin-top: 1rem;">
+                                    <p style="margin-bottom: 0.5rem; font-weight: 500; color: #333;">미리보기:</p>
+                                    <img src="${e.target.result}" alt="미리보기" style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                                </div>
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        filePreview.innerHTML = '';
+                    }
+                });
+            }
+            
+            // 별점 선택 시 효과음 (선택사항)
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    // 선택된 별점 표시
+                    const ratingText = document.querySelector('.rating-text');
+                    const selectedRating = this.previousElementSibling.value;
+                    const ratingTexts = {
+                        '1': '별로예요 😞',
+                        '2': '그저 그래요 😐',
+                        '3': '보통이에요 🙂',
+                        '4': '좋아요! 😊',
+                        '5': '최고예요! 🤩'
+                    };
+                    ratingText.textContent = ratingTexts[selectedRating] || '별을 클릭해서 평점을 매겨주세요';
+                    ratingText.style.color = '#ff6b35';
+                    ratingText.style.fontWeight = 'bold';
+                });
+            });
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // detail.ejs에서 "장바구니 담기" 시, 해당 옷의 type(또는 category, gender 등)을 localStorage에 저장
+        function addToCart() {
+    const size = document.getElementById('selectedSize').textContent;
+    const quantity = document.getElementById('quantity').value;
+    const user_id = '<%= user ? user.id : "" %>';
+    const cloth_id = '<%= item.id %>';
+    const name = '<%= item.name %>';
+    const image_url = "<%= item.image_url %>";
+
+    const cartData = {
+        user_id,
+        cloth_id,
+        name,
+        image_url,
+        size,
+        quantity
+    };
+
+    console.log("보내는 데이터:", cartData);
+
+    fetch('/api/v1/cartgo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cartData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showCartPopup();
+        } else {
+            let reason = data.message || data.error || '알 수 없는 이유';
+            alert('장바구니 담기에 실패했습니다.\n사유: ' + reason);
+        }
+    })
+    .catch((err) => {
+        alert('장바구니 요청 중 오류가 발생했습니다.\n' + (err.message || err));
+    });
+}
+
+        
+        // Buy now
+        function buyNow() {
+            const selectedSize = document.getElementById('selectedSize').textContent;
+            const selectedColor = document.getElementById('selectedColor').textContent;
+            const quantity = document.getElementById('quantity').value;
+            
+            alert(`주문 페이지로 이동합니다!\n색상: ${selectedColor}\n사이즈: ${selectedSize}\n수량: ${quantity}`);
+        }
+
+        // Tab functionality
+        function showTab(tabName) {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // AI Modal functions
+        function openAIModal() {
+            document.getElementById('aiModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            
+            // Reset modal state
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('aiResult').style.display = 'none';
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('uploadArea').style.display = 'none';
+                    document.getElementById('previewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function processAI() {
+            // Simulate AI processing
+            alert('AI 처리를 시작합니다. 잠시만 기다려주세요...');
+            
+            setTimeout(() => {
+                document.getElementById('previewContainer').style.display = 'none';
+                document.getElementById('aiResult').style.display = 'block';
+            }, 2000);
+        }
+
+        function downloadResult() {
+            alert('AI 처리 결과가 다운로드됩니다!');
+        }
+
+        // Drag and drop for file upload
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('previewImage').src = e.target.result;
+                        document.getElementById('uploadArea').style.display = 'none';
+                        document.getElementById('previewContainer').style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('aiModal');
+            if (e.target === modal) {
+                closeAIModal();
+            }
+        });
+
+
+        function showCartPopup() {
+            const popup = document.getElementById('cartPopup');
+            popup.classList.add('show');
+
+            // 몇 초 후 자동 사라짐 (선택사항)
+            setTimeout(() => {
+            popup.classList.remove('show');
+            }, 8000); // 5초 후 자동 숨김
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }  
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </script>
+
+
+
+
+
+
+        <!-- ✅ 여기에 팝업 삽입 -->
+<div id="cartPopup" class="cart-popup">
+  <p>🛒 장바구니에 담겼습니다!</p>
+  <button onclick="goToCart()">장바구니로 이동</button>
+</div>
+</body>
+</html>
+</html>

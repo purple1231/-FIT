@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || '회원가입' %> - <%= shopName || 'Fashion Store' %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-menu a:hover {
+            color: #e74c3c;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon {
+            position: relative;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-icon {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .signup-container {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .signup-header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .signup-header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .profile-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .profile-upload:hover {
+            border-color: #e74c3c;
+        }
+
+        .profile-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px solid #e74c3c;
+        }
+
+        .profile-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-preview .placeholder {
+            font-size: 3rem;
+            color: #ccc;
+        }
+
+        .upload-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: #c0392b;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .signup-btn {
+            width: 100%;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .signup-btn:hover {
+            background: #c0392b;
+        }
+
+        .signup-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #155724;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 10px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .login-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .login-section p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .login-link {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link:hover {
+            color: #c0392b;
+            text-decoration: underline;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .strength-weak { color: #dc3545; }
+        .strength-medium { color: #ffc107; }
+        .strength-strong { color: #28a745; }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-menu {
+                gap: 20px;
+            }
+
+            .signup-container {
+                padding: 30px 20px;
+            }
+
+            .signup-header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo"><%= shopName || 'Fashion Store' %></a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/">홈</a></li>
+                    <li><a href="#categories">카테고리</a></li>
+                    <li><a href="#products">상품</a></li>
+                    <li><a href="#about">소개</a></li>
+                    <li><a href="#contact">연락처</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-actions">
+                <a href="/cart" class="cart-icon">
+                    🛒
+                    <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+                        <span class="cart-count"><%= cartCount %></span>
+                    <% } %>
+                </a>
+                <span class="user-icon">👤</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="signup-container">
+            <div class="signup-header">
+                <h1>회원가입</h1>
+                <p><%= shopName || 'Fashion Store' %>에 오신 것을 환영합니다</p>
+            </div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="email">이메일 *</label>
+                    <input type="email" id="email" name="email" required placeholder="example@email.com" 
+                           value="<%= typeof formData !== 'undefined' ? formData.email || '' : '' %>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">아이디 *</label>
+                    <input type="text" id="username" name="username" required placeholder="영문, 숫자 조합 4-20자"
+                           value="<%= typeof formData !== 'undefined' ? formData.username || '' : '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" name="name" placeholder="실명을 입력해주세요"
+                           value="<%= typeof formData !== 'undefined' ? formData.name || '' : '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">전화번호</label>
+                    <input type="tel" id="phone" name="phone" placeholder="010-1234-5678"
+                           value="<%= typeof formData !== 'undefined' ? formData.phone || '' : '' %>">
+                </div>
+
+                <!-- 키와 몸무게 추가 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="height">키 (cm)</label>
+                        <input type="number" id="height" name="height" placeholder="170" min="100" max="250"
+                               value="<%= typeof formData !== 'undefined' ? formData.height || '' : '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">몸무게 (kg)</label>
+                        <input type="number" id="weight" name="weight" placeholder="70" min="30" max="200"
+                               value="<%= typeof formData !== 'undefined' ? formData.weight || '' : '' %>">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">비밀번호 *</label>
+                    <input type="password" id="password" name="password" required placeholder="8자 이상, 영문/숫자/특수문자 포함">
+                    <div id="passwordStrength" class="password-strength"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">비밀번호 확인 *</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="비밀번호를 다시 입력해주세요">
+                </div>
+
+                <div class="form-group">
+                    <label>프로필 사진</label>
+                    <div class="profile-upload">
+                        <div class="profile-preview" id="profilePreview">
+                            <span class="placeholder">👤</span>
+                        </div>
+                        <button type="button" class="upload-btn" onclick="document.getElementById('profileImage').click()">
+                            사진 선택
+                        </button>
+                        <input type="file" id="profileImage" name="profileImage" accept="image/*" class="file-input">
+                        <p style="font-size: 0.9rem; color: #666;">JPG, PNG 파일만 업로드 가능 (최대 5MB)</p>
+                    </div>
+                </div>
+                
+                <button type="submit" class="signup-btn" id="submitBtn">회원가입</button>
+                
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="error-message" style="display: block;"><%= error %></div>
+                <% } %>
+                
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="success-message" style="display: block;"><%= success %></div>
+                <% } %>
+                
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+            </form>
+
+            <div class="login-section">
+                <p>이미 회원이신가요? <a href="/login" class="login-link">로그인</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 프로필 이미지 미리보기
+        document.getElementById('profileImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('profilePreview');
+            
+            if (file) {
+                // 파일 크기 체크 (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showError('파일 크기는 5MB 이하여야 합니다.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="프로필 미리보기">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 비밀번호 강도 체크
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            
+            if (password.length === 0) {
+                strengthDiv.textContent = '';
+                return;
+            }
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-zA-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            if (strength < 2) {
+                strengthDiv.textContent = '약함';
+                strengthDiv.className = 'password-strength strength-weak';
+            } else if (strength < 4) {
+                strengthDiv.textContent = '보통';
+                strengthDiv.className = 'password-strength strength-medium';
+            } else {
+                strengthDiv.textContent = '강함';
+                strengthDiv.className = 'password-strength strength-strong';
+            }
+        });
+
+        // 폼 제출
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const profileImage = document.getElementById('profileImage').files[0];
+            
+            // 클라이언트 측 검증
+            if (password !== confirmPassword) {
+                showError('비밀번호가 일치하지 않습니다.');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showError('비밀번호는 8자 이상이어야 합니다.');
+                return;
+            }
+            
+            // FormData에 데이터 추가
+            formData.append('email', email);
+            formData.append('username', username);
+            formData.append('name', name);
+            formData.append('phone', phone);
+            formData.append('height', height);
+            formData.append('weight', weight);
+            formData.append('password', password);
+            
+            if (profileImage) {
+                formData.append('profileImage', profileImage);
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '가입 중...';
+            
+            try {
+                const response = await fetch('/api/v1/signup', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '회원가입 실패');
+                }
+                
+                const data = await response.json();
+                showSuccess('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.');
+                
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+                
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '회원가입';
+            }
+        });
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            
+            successElement.style.display = 'none';
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            // 5초 후 에러 메시지 숨기기
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successMessage');
+            
+            errorElement.style.display = 'none';
+            successElement.textContent = message;
+            successElement.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -117,7 +117,7 @@
 
         .cart-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             padding: 30px 0;
             border-bottom: 1px solid #eee;
             gap: 25px;
@@ -125,6 +125,13 @@
 
         .cart-item:last-child {
             border-bottom: none;
+        }
+
+        .item-images {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-shrink: 0;
         }
 
         .item-image {
@@ -137,11 +144,46 @@
             justify-content: center;
             color: #666;
             font-size: 0.9rem;
-            flex-shrink: 0;
             overflow: hidden;
         }
 
         .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ai-image {
+            width: 220px;
+            height: 220px;
+            background: #f0f8ff;
+            border: 2px solid #4a90e2;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a90e2;
+            font-size: 0.9rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ai-image::after {
+            content: "AI 착용 이미지";
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4a90e2;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .ai-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -350,9 +392,19 @@
                 gap: 20px;
             }
 
+            .item-images {
+                flex-direction: row;
+                align-items: center;
+            }
+
             .item-image {
                 width: 100px;
                 height: 100px;
+            }
+
+            .ai-image {
+                width: 160px;
+                height: 160px;
             }
 
             .quantity-controls {
@@ -405,13 +457,24 @@
                 <div id="cart-items">
                     <% cartItems.forEach(function(item) { %>
                         <div class="cart-item" data-id="<%= item.id %>">
-                            <div class="item-image">
-                                <% if (item.image) { %>
-                                    <img src="<%= item.image %>" alt="<%= item.name %>">
-                                <% } else { %>
-                                    <%= item.name %>
+                            <div class="item-images">
+                                <!-- 기본 상품 이미지 (항상 표시) -->
+                                <div class="item-image">
+                                    <% if (item.image) { %>
+                                        <img src="<%= item.image %>" alt="<%= item.name %>">
+                                    <% } else { %>
+                                        <%= item.name %>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- AI 착용 이미지 (있을 때만 표시) -->
+                                <% if (item.ai_image) { %>
+                                    <div class="ai-image">
+                                        <img src="<%= item.ai_image %>" alt="<%= item.name %> AI 착용 이미지">
+                                    </div>
                                 <% } %>
                             </div>
+                            
                             <div class="item-details">
                                 <div class="item-name"><%= item.name %></div>
                                 <div class="item-description"><%= item.description %></div>

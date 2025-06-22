@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 // 정적 파일 서빙 설정
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 세션 설정 (로그인 상태 유지용)
 app.use(session({
@@ -42,23 +42,23 @@ console.log("✅ cartRouter 라우트 등록 후");
 // 라우트 설정
 const loginRoutes = require('./routes/v1/loginRoutes');
 const userRoutes = require('./routes/v1/userRoutes');
-const authRoutes = require('./routes/v1/authRoutes');
 const tryonRoutes = require('./routes/v1/tryon');
 const detailRouter = require('./routes/v1/detailRouter');
 const gotoCartRouter = require('./routes/v1/gotoCartRouter'); // 장바구니 라우트 추가
 const clothRouter = require('./routes/v1/clothRouter');
-const checkClothRouter = require('./routes/v1/checkCloth'); 
+const checkClothRouter = require('./routes/v1/checkCloth');
+const signupRouter = require('./routes/v1/signup');
+
 console.log('✅ detailRouter:', detailRouter); // 확인용
 
 app.use('/api/v1', tryonRoutes); // 가상 피팅 라우트 추가
-app.use('/api/v1', authRoutes);
 app.use('/api/v1', loginRoutes);
 app.use('/api/v1', userRoutes);
 app.use('/api/v1', detailRouter);
 app.use('/api/v1', gotoCartRouter); // 장바구니 라우트 추가
 app.use('/api/v1', clothRouter);
 app.use('/api/v1', checkClothRouter); // 옷 체크 라우트 추가
-
+app.use('/api/v1', signupRouter);
 
 
 
@@ -67,7 +67,6 @@ app.use('/api/v1', checkClothRouter); // 옷 체크 라우트 추가
 // 페이지 라우트
 app.get('/', (req, res) => res.render('test'));
 app.get('/login', (req, res) => res.render('login'));
-app.get('/signup', (req, res) => res.render('signup'));
 app.get('/test', (req, res) => res.render('test'));
 app.get('/users', (req, res) => res.render('users'));
 app.get('/apitest', (req, res) => res.render('apitest'));
@@ -82,7 +81,13 @@ app.get('/home', (req, res) => {
   }
 });
 
-
+app.get('/signup', (req, res) => {
+  res.render('signup', {
+    title: '회원가입',
+    shopName: 'Fashion Store',
+    cartCount: 0
+  });
+});
 
 
 // 404 처리

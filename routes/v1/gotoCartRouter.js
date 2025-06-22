@@ -53,7 +53,7 @@ router.post('/cartgo', async (req, res) => {
     console.log('image_url:', image_url);
 
     // 가상 피팅 처리 (비동기로 실행)
-    processTryOn(avatarUrlFull, clothingUrlFull, cartId)
+    processTryOn(avatarUrlFull, clothingUrlFull, cartId, user_id)
       .then(async (tryonImagePath) => {
       await db.query(
         `UPDATE cart SET ai_cloth_url = ? WHERE id = ?`,

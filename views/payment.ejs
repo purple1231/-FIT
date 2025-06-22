@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>결제하기 - ShopMall</title>
-    <link rel="stylesheet" href="/styles/payment.css"> <!-- CSS는 외부로 분리된 상태 -->
+    <link rel="stylesheet" href="/payment.css"> <!-- CSS는 외부로 분리된 상태 -->
 </head>
 <body>
 <header>
@@ -36,7 +36,22 @@
     <div class="container">
         <div class="payment-container">
             <div class="payment-form">
-                <form action="/process-payment" method="POST">
+                
+                <form action="/api/v1/end" method="post">
+
+
+
+
+
+                    <!-- items 정보를 hidden input으로 JSON 직렬화하여 전송 -->
+
+                    <input type="hidden" name="itemsJson" value='<%= JSON.stringify(items) %>'>
+
+
+
+
+
+
                     <!-- 주문자 정보 -->
                     <div class="form-section">
                         <h2 class="section-title">👤 주문자 정보</h2>

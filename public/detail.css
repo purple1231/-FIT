@@ -573,8 +573,424 @@
             margin-bottom: 1rem;
         }
 
+
+        .review-form-wrapper {
+        margin-top: 2rem;
+        padding: 2.5rem;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 248, 240, 0.9));
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        border-radius: 20px;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.1);
+        backdrop-filter: blur(10px);
+        }
+
+        .review-form-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e, #ff8c42);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            z-index: -1;
+        }
+
+        .review-form-wrapper.disabled {
+            background: linear-gradient(135deg, rgba(248, 249, 250, 0.9), rgba(240, 240, 240, 0.9));
+            border-color: #ddd;
+        }
+
+        .review-form-wrapper.disabled::before {
+            background: linear-gradient(135deg, #ddd, #ccc);
+        }
+
+        .review-title {
+            margin-bottom: 2rem;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            position: relative;
+        }
+
+        .review-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b35, #f7931e);
+            border-radius: 2px;
+        }
+
+        /* 내 AI 착샷 미리보기 */
+        .my-tryon-preview {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .preview-label {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .tryon-image {
+            max-width: 300px;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        /* 폼 스타일 */
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 100%;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 별점 스타일 */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            gap: 0.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+
+        .star-rating .star {
+            font-size: 2.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .star-rating .star:hover,
+        .star-rating .star:hover ~ .star,
+        .star-rating input[type="radio"]:checked ~ .star {
+            color: #ff6b35;
+            transform: scale(1.1);
+            text-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .star-rating .star:hover {
+            animation: starBounce 0.3s ease;
+        }
+
+        @keyframes starBounce {
+            0%, 100% { transform: scale(1.1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .rating-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* 텍스트에어리어 스타일 */
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .styled-textarea {
+            width: 100%;
+            padding: 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .styled-textarea:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .textarea-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e) border-box;
+            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .styled-textarea:focus + .textarea-border {
+            opacity: 1;
+        }
+
+        /* 파일 업로드 스타일 */
+        .file-upload-wrapper {
+            position: relative;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border: 2px dashed #ff6b35;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(247, 147, 30, 0.05));
+        }
+
+        .file-upload-label:hover {
+            border-color: #f7931e;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(247, 147, 30, 0.1));
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: #ff6b35;
+        }
+
+        .upload-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .upload-main {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .upload-sub {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .file-preview img {
+            max-width: 200px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 제출 버튼 스타일 */
+        .submit-btn {
+            align-self: center;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        .btn-text {
+            font-weight: 600;
+        }
+
+        .btn-shine {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover .btn-shine {
+            left: 100%;
+        }
+
+        /* 비활성화 상태 */
+        .disabled-message {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .disabled-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .disabled-text {
+            color: #666;
+            font-size: 1.1rem;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .disabled-decoration {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #ddd;
+            border-radius: 50%;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+
+
+
+
+        /* 애니메이션 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .review-form-wrapper {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+
+
         /* Responsive */
         @media (max-width: 768px) {
+
+
+
+            .review-form-wrapper {
+                padding: 1.5rem;
+                margin-top: 1.5rem;
+            }
+            
+            .star-rating .star {
+                font-size: 2rem;
+            }
+            
+            .file-upload-label {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.8rem;
+            }
+            
+            .submit-btn {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .tryon-image {
+                max-width: 250px;
+            }
+
+
+
+
+
+
             .nav-links {
             display: none;
             }
@@ -634,4 +1050,12 @@
             .cart-popup button:hover {
             background-color: #ffe0c2;
             }
+
+
+
+
+
+
+
+
         }

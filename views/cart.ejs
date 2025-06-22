@@ -451,7 +451,7 @@
                         <span id="total"><%= formatPrice(summary.total) %>원</span>
                     </div>
                 <div class="checkout-section">
-                    <form action="/payment" method="POST" id="checkoutForm">
+                    <form action="/api/v1/payment" method="POST" id="checkoutForm">
                         <input type="hidden" name="itemsJson" id="itemsJson">
                         <button type="button" class="checkout-btn" onclick="checkout()">주문하기</button>
                     </form>

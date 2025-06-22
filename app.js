@@ -51,6 +51,7 @@ const checkClothRouter = require('./routes/v1/checkCloth');
 const paumentRouter = require('./routes/v1/paymentRouter'); // 결제 라우트 추가
 const endRouter = require('./routes/v1/endRouter'); // 결제 완료 라우트 추가
 const signupRouter = require('./routes/v1/signup');
+const mypageRouter = require("./routes/v1/mypage") // 마이페이지 라우터 추가
 
 console.log('✅ detailRouter:', detailRouter); // 확인용
 
@@ -65,7 +66,7 @@ app.use('/api/v1', paumentRouter); // 결제 라우트 추가
 app.use('/api/v1', endRouter); // 결제 완료 라우트 추가
 
 app.use('/api/v1', signupRouter);
-
+app.use("/mypage", mypageRouter) // 마이페이지 라우터 등록
 
 
 

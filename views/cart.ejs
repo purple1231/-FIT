@@ -513,10 +513,11 @@
                         <span>총 결제 금액:</span>
                         <span id="total"><%= formatPrice(summary.total) %>원</span>
                     </div>
-                </div>
-
                 <div class="checkout-section">
-                    <button class="checkout-btn" onclick="checkout()">주문하기</button>
+                    <form action="/api/v1/payment" method="POST" id="checkoutForm">
+                        <input type="hidden" name="itemsJson" id="itemsJson">
+                        <button type="button" class="checkout-btn" onclick="checkout()">주문하기</button>
+                    </form>
                     <a href="/" class="continue-shopping">쇼핑 계속하기</a>
                 </div>
             <% } else { %>
@@ -623,9 +624,25 @@
         }
 
         function checkout() {
-            alert('주문 페이지로 이동합니다!');
-            // 실제 구현에서는 결제 페이지로 이동
-        }
+    const cartItems = document.querySelectorAll('.cart-item');
+    const items = [];
+
+    cartItems.forEach(item => {
+        const id = item.dataset.id;
+        const name = item.querySelector('.item-name').textContent.trim();
+        const price = parseInt(item.querySelector('.quantity-input').dataset.price);
+        const quantity = parseInt(item.querySelector('.quantity-input').value);
+        const image = item.querySelector('img')?.src || null;
+
+        items.push({ id, name, price, quantity, image });
+    });
+
+    // form의 hidden input에 JSON 담기
+    document.getElementById('itemsJson').value = JSON.stringify(items);
+
+    // form 제출
+    document.getElementById('checkoutForm').submit();
+}
     </script>
 </body>
 </html>

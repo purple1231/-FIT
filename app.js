@@ -47,6 +47,8 @@ const detailRouter = require('./routes/v1/detailRouter');
 const gotoCartRouter = require('./routes/v1/gotoCartRouter'); // 장바구니 라우트 추가
 const clothRouter = require('./routes/v1/clothRouter');
 const checkClothRouter = require('./routes/v1/checkCloth');
+const paumentRouter = require('./routes/v1/paymentRouter'); // 결제 라우트 추가
+const endRouter = require('./routes/v1/endRouter'); // 결제 완료 라우트 추가
 const signupRouter = require('./routes/v1/signup');
 
 console.log('✅ detailRouter:', detailRouter); // 확인용
@@ -58,6 +60,9 @@ app.use('/api/v1', detailRouter);
 app.use('/api/v1', gotoCartRouter); // 장바구니 라우트 추가
 app.use('/api/v1', clothRouter);
 app.use('/api/v1', checkClothRouter); // 옷 체크 라우트 추가
+app.use('/api/v1', paumentRouter); // 결제 라우트 추가
+app.use('/api/v1', endRouter); // 결제 완료 라우트 추가
+
 app.use('/api/v1', signupRouter);
 
 
@@ -71,6 +76,9 @@ app.get('/test', (req, res) => res.render('test'));
 app.get('/users', (req, res) => res.render('users'));
 app.get('/apitest', (req, res) => res.render('apitest'));
 app.get('/mainImsi', (req, res) => res.render('mainImsi'));
+
+
+
 
 app.get('/home', (req, res) => {
   try {
@@ -100,22 +108,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`서버가 http://localhost:${PORT}에서 실행 중입니다.`);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-// 1. AI 이용해서 옷파는 사이트 
-
-// 2.
-
 
 
 

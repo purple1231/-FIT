@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -8,14 +7,47 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/detail.css">
+    <style>
+        .cart-popup {
+        position: fixed;
+        bottom: -100px; /* 기본적으로 안 보이게 */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ff7f00;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 10px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        z-index: 9999;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        transition: bottom 0.3s ease-in-out;
+        }
+
+        .cart-popup.show {
+        bottom: 40px; /* 팝업이 올라옴 */
+        }
+
+        .cart-popup button {
+        background-color: white;
+        color: #ff7f00;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
     <header>
         <nav class="container">
-            <a href="#" class="logo">FIT AI 쇼핑몰</a>
+            <a href="/home" class="logo">FIT AI 쇼핑몰</a>
             <ul class="nav-links">
-                <li><a href="#">홈</a></li>
+                <li><a href="/home">홈</a></li>
                 <li><a href="#">카테고리</a></li>
                 <li><a href="#">베스트</a></li>
                 <li><a href="#">세일</a></li>
@@ -24,9 +56,9 @@
             <div class="nav-icons">
                 <a href="#"><i class="fas fa-search"></i></a>
                 <a href="#"><i class="fas fa-heart"></i></a>
-                <a href="#" id="cartIcon">
+                <a href="/cart" id="cartIcon">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count">2</span>
+                    <span class="cart-count"><%= cartCount || 0 %></span>
                 </a>
                 <a href="#"><i class="fas fa-user"></i></a>
             </div>
@@ -156,7 +188,7 @@
             <div class="product-tabs">
                 <div class="tab-buttons">
                     <button class="tab-btn active" onclick="showTab('description')">상품설명</button>
-                    <button class="tab-btn" onclick="showTab('reviews')">리뷰 (128)</button>
+                    <button class="tab-btn" onclick="showTab('reviews')">리뷰 (<%= reviews.length %>)</button>
                     <button class="tab-btn" onclick="showTab('shipping')">배송/교환</button>
                     <button class="tab-btn" onclick="showTab('qna')">Q&A</button>
                 </div>
@@ -206,36 +238,128 @@
                 </div>
 
                 <div class="tab-content" id="reviews">
-                    <h3>고객 리뷰</h3>
-                    <div class="review-item">
+                    <h3>고객 ai 착샷 리뷰</h3>
+
+                    <!-- 기존 리뷰들 -->
+                    <% if (reviews && reviews.length > 0) { %>
+                    <% reviews.forEach(review => { %>
+                        <div class="review-item">
                         <div class="review-header">
-                            <span class="reviewer-name">김**</span>
-                            <span class="review-date">2024.01.15</span>
+                            <span class="reviewer-name"><%= review.username.slice(0, 1) %>**</span>
+                            <span class="review-date"><%= new Date(review.created_at).toISOString().split('T')[0] %></span>
                         </div>
                         <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                            <% for (let i = 1; i <= 5; i++) { %>
+                            <% if (i <= review.rating) { %>
+                                <i class="fas fa-star"></i>
+                            <% } else { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                            <% } %>
                         </div>
-                        <p>정말 따뜻하고 부드러워요! 디자인도 예쁘고 품질이 좋습니다. 추천해요!</p>
+                        <% if (review.ai_image_url) { %>
+                            <div style="margin: 10px 0;">
+                            <img src="<%= review.ai_image_url %>" alt="AI 착샷" style="max-width: 250px; border: 1px solid #ccc; border-radius: 6px;">
+                            </div>
+                        <% } %>
+                        <p><%= review.content || '' %></p>
+                        </div>
+                    <% }); %>
+                    <% } else { %>
+                        <p style="color: gray;">아직 등록된 리뷰가 없습니다.</p>
+                    <% } %>
+
+
+                    <!-- ✍ 리뷰 작성 폼 -->
+                    <!-- ✍ 다른 사람들의 AI 착샷 보기 -->
+                    <!-- ✍ 다른 사람들의 AI 착샷 보기 -->
+                    <!-- ✍ 리뷰 작성 폼 -->
+                    <% if (canReview) { %>
+                    <div class="review-form-wrapper">
+                        <h4 class="review-title">🧍 다른 사람들의 AI 착샷 공유</h4>
+
+                        <!-- ✅ 내 AI 착샷 미리보기 -->
+                        <% if (myTryonImage) { %>
+                            <div class="my-tryon-preview">
+                                <p class="preview-label">내 AI 착샷 미리보기 👕</p>
+                                <div class="image-container">
+                                    <img src="<%= myTryonImage %>" alt="내 AI 착샷" class="tryon-image">
+                                    <div class="image-overlay">
+                                        <span class="overlay-text">AI 착샷</span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <form action="/api/v1/review" method="POST" enctype="multipart/form-data" class="review-form">
+                            <input type="hidden" name="cloth_id" value="<%= item.id %>">
+                            <input type="hidden" name="user_id" value="<%= user ? user.id : '' %>">
+                            <input type="hidden" name="ai_image_url" value="<%= myTryonImage %>">
+
+                            <!-- 별점 선택 -->
+                            <div class="form-group">
+                                <label class="form-label">평점을 선택해주세요</label>
+                                <div class="star-rating">
+                                    <input type="radio" name="rating" value="5" id="star5">
+                                    <label for="star5" class="star">★</label>
+                                    <input type="radio" name="rating" value="4" id="star4">
+                                    <label for="star4" class="star">★</label>
+                                    <input type="radio" name="rating" value="3" id="star3">
+                                    <label for="star3" class="star">★</label>
+                                    <input type="radio" name="rating" value="2" id="star2">
+                                    <label for="star2" class="star">★</label>
+                                    <input type="radio" name="rating" value="1" id="star1">
+                                    <label for="star1" class="star">★</label>
+                                </div>
+                                <div class="rating-text">별을 클릭해서 평점을 매겨주세요</div>
+                            </div>
+
+                            <!-- 리뷰 내용 -->
+                            <div class="form-group">
+                                <label for="content" class="form-label">한줄 느낌 또는 AI 착샷 설명 (선택)</label>
+                                <div class="textarea-wrapper">
+                                    <textarea name="content" id="content" rows="4" placeholder="예: 팔 길이가 좀 짧게 나왔어요! AI 착샷이 실제와 비슷해요!" class="styled-textarea"></textarea>
+                                    <div class="textarea-border"></div>
+                                </div>
+                            </div>
+
+                            <!-- 실제 착샷 첨부 -->
+                            <div class="form-group">
+                                <label for="real_image" class="form-label">실제 착샷 첨부 (선택)</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="real_image" id="real_image" accept="image/*" class="file-input">
+                                    <label for="real_image" class="file-upload-label">
+                                        <div class="upload-icon">📷</div>
+                                        <div class="upload-text">
+                                            <span class="upload-main">사진 선택하기</span>
+                                            <span class="upload-sub">실제 착용 사진을 업로드해주세요</span>
+                                        </div>
+                                    </label>
+                                    <div class="file-preview" id="filePreview"></div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-icon">🚀</span>
+                                <span class="btn-text">AI 착샷 공유하기</span>
+                                <div class="btn-shine"></div>
+                            </button>
+                        </form>
                     </div>
-                    <div class="review-item">
-                        <div class="review-header">
-                            <span class="reviewer-name">이**</span>
-                            <span class="review-date">2024.01.12</span>
+                    <% } else { %>
+                    <div class="review-form-wrapper disabled">
+                        <div class="disabled-message">
+                            <div class="disabled-icon">⚠️</div>
+                            <p class="disabled-text">AI 착샷 공유는 해당 상품을 구매한 사용자만 가능합니다.</p>
+                            <div class="disabled-decoration"></div>
                         </div>
-                        <div class="review-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <p>사이즈가 딱 맞고 색상도 사진과 동일해요. 만족합니다.</p>
                     </div>
+                    <% } %>
+                        
+
+
                 </div>
+
 
                 <div class="tab-content" id="shipping">
                     <h3>배송 및 교환/반품 안내</h3>
@@ -297,11 +421,6 @@
     </div>
 
     <script>
-
-
-        
-
-
         // Image gallery
         function changeMainImage(thumbnail) {
             const mainImage = document.getElementById('mainImage');
@@ -360,41 +479,120 @@
         }
 
 
-        function addToCart() {
-            const size = document.getElementById('selectedSize').textContent;
-            const quantity = document.getElementById('quantity').value;
-            const user_id = '<%= user.id %>'; 
-            const cloth_id = '<%= item.id %>'; 
-            const name = '<%= item.name %>'; 
-            const image_url = "<%= item.image_url %>";
 
-            fetch('/api/v1/cartgo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    size: size,
-                    quantity: quantity,
-                    user_id: user_id,
-                    cloth_id: cloth_id,
-                    name: name,
-                    image_url: image_url
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('장바구니에 담겼습니다!');
-                } else {
-                    alert('장바구니 담기에 실패했습니다.');
-                }
-            })
-            .catch(() => {
-                alert('장바구니 요청 중 오류가 발생했습니다.');
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 파일 업로드 미리보기
+            const fileInput = document.getElementById('real_image');
+            const filePreview = document.getElementById('filePreview');
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            filePreview.innerHTML = `
+                                <div style="margin-top: 1rem;">
+                                    <p style="margin-bottom: 0.5rem; font-weight: 500; color: #333;">미리보기:</p>
+                                    <img src="${e.target.result}" alt="미리보기" style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                                </div>
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        filePreview.innerHTML = '';
+                    }
+                });
+            }
+            
+            // 별점 선택 시 효과음 (선택사항)
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    // 선택된 별점 표시
+                    const ratingText = document.querySelector('.rating-text');
+                    const selectedRating = this.previousElementSibling.value;
+                    const ratingTexts = {
+                        '1': '별로예요 😞',
+                        '2': '그저 그래요 😐',
+                        '3': '보통이에요 🙂',
+                        '4': '좋아요! 😊',
+                        '5': '최고예요! 🤩'
+                    };
+                    ratingText.textContent = ratingTexts[selectedRating] || '별을 클릭해서 평점을 매겨주세요';
+                    ratingText.style.color = '#ff6b35';
+                    ratingText.style.fontWeight = 'bold';
+                });
             });
-            alert('선택된 사이즈: ' + size);
-        } 
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // detail.ejs에서 "장바구니 담기" 시, 해당 옷의 type(또는 category, gender 등)을 localStorage에 저장
+        function addToCart() {
+    const size = document.getElementById('selectedSize').textContent;
+    const quantity = document.getElementById('quantity').value;
+    const user_id = '<%= user ? user.id : "" %>';
+    const cloth_id = '<%= item.id %>';
+    const name = '<%= item.name %>';
+    const image_url = "<%= item.image_url %>";
+
+    const cartData = {
+        user_id,
+        cloth_id,
+        name,
+        image_url,
+        size,
+        quantity
+    };
+
+    console.log("보내는 데이터:", cartData);
+
+    fetch('/api/v1/cartgo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cartData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showCartPopup();
+        } else {
+            let reason = data.message || data.error || '알 수 없는 이유';
+            alert('장바구니 담기에 실패했습니다.\n사유: ' + reason);
+        }
+    })
+    .catch((err) => {
+        alert('장바구니 요청 중 오류가 발생했습니다.\n' + (err.message || err));
+    });
+}
+
         
         // Buy now
         function buyNow() {
@@ -499,10 +697,41 @@
             }
         });
 
+
+        function showCartPopup() {
+            const popup = document.getElementById('cartPopup');
+            popup.classList.add('show');
+
+            // 몇 초 후 자동 사라짐 (선택사항)
+            setTimeout(() => {
+            popup.classList.remove('show');
+            }, 8000); // 5초 후 자동 숨김
+        }
+
+        function goToCart() {
+            window.location.href = '/cart';
+        }  
+        
+        
+        
+        
+        
+        
         
         
         
         </script>
+
+
+
+
+
+
+        <!-- ✅ 여기에 팝업 삽입 -->
+<div id="cartPopup" class="cart-popup">
+  <p>🛒 장바구니에 담겼습니다!</p>
+  <button onclick="goToCart()">장바구니로 이동</button>
+</div>
 </body>
 </html>
 </html>

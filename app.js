@@ -89,10 +89,8 @@ app.get('/mainImsi', (req, res) => res.render('mainImsi'));
 // 로그인된 사용자만 접근 가능
 app.get('/home', async (req, res) => {
   try {
-    // 로그인 안 된 경우 접근 제한
     if (!req.session.user) {
       return res.status(401).send('로그인이 필요합니다');
-      // 또는: return res.redirect('/login');
     }
 
     const userId = req.session.user.id;
@@ -103,18 +101,26 @@ app.get('/home', async (req, res) => {
         SELECT cloth_id FROM cart WHERE user_id = ?
       )
     `, [userId]);
-      console.log("지금 아이템 목록:", clothRows);
 
+    // ✅ 랜덤 추천 2개 선택 (또는 앞 2개)
+    const recommended = clothRows
+      .sort(() => Math.random() - 0.5) // 랜덤 정렬
+      .slice(0, 2);                    // 2개만 선택
+
+    console.log("지금 아이템 목록:", clothRows);
+    console.log("추천 상품:", recommended);
 
     res.render('home', {
       user: req.session.user,
-      products: clothRows
+      products: clothRows,
+      recommended // 🔥 뷰로 전달
     });
   } catch (error) {
     console.error('홈 렌더링 에러:', error.message);
     res.status(500).send('서버 렌더링 오류 발생');
   }
 });
+
 
 
 

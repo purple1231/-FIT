@@ -130,15 +130,10 @@ app.get("/home", async (req, res) => {
       )
       clothRows = clothResult || []
 
-<<<<<<< HEAD
     // ✅ 상의 2개, 하의 2개 추천
     const shirts = clothRows.filter(item => item.type === 'shirt').slice(0, 2)
     const pants = clothRows.filter(item => item.type === 'pants').slice(0, 2)
     const recommended = [...shirts, ...pants]
-=======
-      // 랜덤 추천 2개 선택
-      recommended = clothRows.sort(() => Math.random() - 0.5).slice(0, 2)
->>>>>>> 0fb379f2d2656bd393f8c48f914a85cd5e472128
 
       console.log("👕 상품 개수:", clothRows.length) // 디버깅용
       console.log("⭐ 추천 상품 개수:", recommended.length) // 디버깅용
@@ -152,11 +147,7 @@ app.get("/home", async (req, res) => {
       user: user,
       cartCount: cartCount, // 항상 숫자값 보장
       products: clothRows,
-<<<<<<< HEAD
       recommended, // 🔥 4개 전달
-=======
-      recommended: recommended,
->>>>>>> 0fb379f2d2656bd393f8c48f914a85cd5e472128
     })
   } catch (error) {
     console.error("홈 렌더링 에러:", error.message)

@@ -136,7 +136,7 @@ app.get("/home", async (req, res) => {
     const recommended = [...shirts, ...pants]
 
       console.log("👕 상품 개수:", clothRows.length) // 디버깅용
-      console.log("⭐ 추천 상품 개수:", recommended.length) // 디버깅용
+      console.log("⭐ 추천 상품 다출력:", recommended) // 디버깅용
     } catch (clothError) {
       console.error("상품 조회 오류:", clothError)
       clothRows = []

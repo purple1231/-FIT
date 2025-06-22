@@ -439,7 +439,7 @@
             <div class="nav-icons">
                 <a href="/cart" id="cart-link">
                     🛒 
-                    <% if (cartCount > 0) { %>
+                    <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
                         <span class="cart-count"><%= cartCount %></span>
                     <% } %>
                 </a>
@@ -707,7 +707,7 @@
                     }
                     
                     // 새로운 cart-count 추가
-                    if (data.count > 0) {
+                    if (typeof data.count !== 'undefined' && data.count > 0) {
                         const countSpan = document.createElement('span');
                         countSpan.className = 'cart-count';
                         countSpan.textContent = data.count;

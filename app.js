@@ -98,42 +98,75 @@ app.get("/home", async (req, res) => {
     }
 
     const userId = req.session.user.id
+    console.log("🔍 현재 사용자 ID:", userId) // 디버깅용
 
     // 사용자 정보 조회 (프로필 이미지 포함)
     const [userRows] = await db.execute("SELECT id, username, email, name, my_url FROM user WHERE id = ?", [userId])
     const user = userRows[0] || req.session.user
 
-    // 장바구니 개수 조회
-    const [cartItems] = await db.execute("SELECT COUNT(*) AS count FROM cart WHERE user_id = ?", [userId])
-    const cartCount = cartItems[0].count
+    // 장바구니 개수 조회 (기본값 설정)
+    let cartCount = 0
+    try {
+      const [cartItems] = await db.execute("SELECT COUNT(*) AS count FROM cart WHERE user_id = ?", [userId])
+      cartCount = cartItems[0]?.count || 0
+      console.log("🛒 장바구니 개수:", cartCount) // 디버깅용
+    } catch (cartError) {
+      console.error("장바구니 개수 조회 오류:", cartError)
+      cartCount = 0 // 에러 시 기본값
+    }
 
-    const [clothRows] = await db.query(
-      `
-      SELECT * FROM cloth
-      WHERE id NOT IN (
-        SELECT cloth_id FROM cart WHERE user_id = ?
+    // 상품 목록 조회 (기본값 설정)
+    let clothRows = []
+    let recommended = []
+    try {
+      const [clothResult] = await db.query(
+        `
+        SELECT * FROM cloth
+        WHERE id NOT IN (
+          SELECT cloth_id FROM cart WHERE user_id = ?
+        )
+      `,
+        [userId],
       )
-    `,
-      [userId],
-    )
+      clothRows = clothResult || []
 
+<<<<<<< HEAD
     // ✅ 상의 2개, 하의 2개 추천
     const shirts = clothRows.filter(item => item.type === 'shirt').slice(0, 2)
     const pants = clothRows.filter(item => item.type === 'pants').slice(0, 2)
     const recommended = [...shirts, ...pants]
+=======
+      // 랜덤 추천 2개 선택
+      recommended = clothRows.sort(() => Math.random() - 0.5).slice(0, 2)
+>>>>>>> 0fb379f2d2656bd393f8c48f914a85cd5e472128
 
-    console.log("지금 아이템 목록:", clothRows)
-    console.log("추천 상품:", recommended)
+      console.log("👕 상품 개수:", clothRows.length) // 디버깅용
+      console.log("⭐ 추천 상품 개수:", recommended.length) // 디버깅용
+    } catch (clothError) {
+      console.error("상품 조회 오류:", clothError)
+      clothRows = []
+      recommended = []
+    }
 
     res.render("home", {
       user: user,
-      cartCount: cartCount,
+      cartCount: cartCount, // 항상 숫자값 보장
       products: clothRows,
+<<<<<<< HEAD
       recommended, // 🔥 4개 전달
+=======
+      recommended: recommended,
+>>>>>>> 0fb379f2d2656bd393f8c48f914a85cd5e472128
     })
   } catch (error) {
     console.error("홈 렌더링 에러:", error.message)
-    res.status(500).send("서버 렌더링 오류 발생")
+    // 에러 시에도 기본값으로 렌더링
+    res.render("home", {
+      user: req.session.user || { username: "Guest" },
+      cartCount: 0,
+      products: [],
+      recommended: [],
+    })
   }
 })
 

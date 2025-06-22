@@ -6,164 +6,513 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
+    * { 
+      box-sizing: border-box; 
       margin: 0;
+      padding: 0;
+    }
+    
+    body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 2rem;
     }
-    h1 {
-      margin-bottom: 2rem;
-      color: #222;
+    
+    h1 { 
+      margin-bottom: 2rem; 
+      color: white;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
+    
     form {
       display: flex;
       gap: 1rem;
       align-items: center;
       justify-content: center;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.1);
     }
-    input[type="file"] {
-      padding: 0.5rem;
+    
+    input[type="file"] { 
+      padding: 0.8rem;
+      border: 2px solid #667eea;
+      border-radius: 10px;
+      background: white;
     }
+    
     button {
-      background: #4a90e2;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
-      font-size: 16px;
-      border-radius: 5px;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
     }
-    button:hover {
-      background: #357abd;
+    
+    button:hover { 
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
     }
+
     #modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      backdrop-filter: blur(8px);
-      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      background-color: rgba(0, 0, 0, 0.6);
       display: flex;
       align-items: center;
       justify-content: center;
       animation: fadeIn 0.6s ease-out;
       z-index: 1000;
+      padding: 2rem;
     }
+    
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    
     .modal-content {
       background: white;
-      border-radius: 10px;
-      padding: 20px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-radius: 25px;
+      padding: 2.5rem;
+      width: 95vw;
+      max-width: 1200px;
+      height: 80vh;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
       animation: popUp 0.5s ease-out;
       position: relative;
+      display: flex;
+      gap: 0;
+      overflow: hidden;
     }
+    
     @keyframes popUp {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+      0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
+    
     .close-btn {
       position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 24px;
+      top: 20px;
+      right: 25px;
+      font-size: 28px;
       color: #666;
       cursor: pointer;
-      transition: color 0.2s;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 10;
     }
+    
     .close-btn:hover {
-      color: #111;
+      color: #333;
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
     }
+    
+    .analysis-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    
+    .canvas-section {
+      flex: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: #f8f9fa;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    
     .canvas-wrapper {
       position: relative;
       width: 100%;
-      padding-top: 140%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    
     canvas {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .connection-section {
+      flex: 3;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: white;
+    }
+    
+    .labels-section {
+      flex: 3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      position: relative;
+    }
+    
+    .label-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      opacity: 0;
+      transform: translateX(50px);
+      animation: slideInRight 0.8s ease-out forwards;
+    }
+    
+    .label-item:nth-child(1) {
+      animation-delay: 1.2s;
+    }
+    
+    .label-item:nth-child(2) {
+      animation-delay: 1.6s;
+    }
+    
+    @keyframes slideInRight {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .label-text {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #333;
+      padding: 1.5rem 2rem;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border-radius: 15px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    }
+    
+    .label-text::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 15px;
+      padding: 2px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .label-text:hover::before {
+      opacity: 1;
+    }
+    
+    .label-text:hover {
+      transform: translateX(-10px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    }
+    
+    .upper-label {
+      color: #e74c3c;
+    }
+    
+    .lower-label {
+      color: #3498db;
+    }
+    
+    /* 화살표 오버레이 */
+    .arrow-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      pointer-events: none;
+      z-index: 5;
     }
-    /* 로딩 화면 */
+    
+    .arrow-line {
+      position: absolute;
+      height: 3px;
+      background: #e74c3c;
+      border-radius: 2px;
+      transform-origin: left center;
+      transform: rotate(45deg); /* 이 각도는 JS에서 계산된 값임 */
+    }
+    
+    .arrow-head {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 12px solid #888;
+      opacity: 0;
+      animation: fadeInArrow 0.5s ease-out forwards;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    
+    .upper-arrow-line {
+      background: linear-gradient(90deg, transparent, #e74c3c, #e74c3c);
+      animation-delay: 0.8s;
+    }
+    
+    .lower-arrow-line {
+      background: linear-gradient(90deg, transparent, #3498db, #3498db);
+      animation-delay: 1.2s;
+    }
+    
+    .upper-arrow-head {
+      border-left-color: #e74c3c;
+      animation-delay: 1.6s;
+    }
+    
+    .lower-arrow-head {
+      border-left-color: #3498db;
+      animation-delay: 2.0s;
+    }
+    
+    @keyframes drawLine {
+      from {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
+    }
+    
+    @keyframes fadeInArrow {
+      to {
+        opacity: 1;
+      }
+    }
+
     #loadingScreen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      animation: fadeIn 0.4s ease-in-out;
     }
+    
     .spinner {
       width: 60px;
       height: 60px;
-      border: 8px solid #ccc;
-      border-top: 8px solid #4a90e2;
+      border: 6px solid #e3e3e3;
+      border-top: 6px solid #667eea;
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
     }
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      color: #667eea;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    /* 반응형 */
+    @media (max-width: 1024px) {
+      .modal-content {
+        flex-direction: column;
+        height: 90vh;
+      }
+      
+      .analysis-container {
+        flex-direction: column;
+      }
+      
+      .canvas-section {
+        flex: 2;
+        margin-bottom: 1rem;
+      }
+      
+      .connection-section {
+        display: none;
+      }
+      
+      .labels-section {
+        flex: 1;
+        flex-direction: row;
+        gap: 1rem;
+      }
+      
+      .label-item {
+        flex: 1;
+      }
+      
+      .label-text {
+        font-size: 1.4rem;
+        padding: 1rem;
+      }
+    }
+    /* (기존 스타일 유지) */
+
+    /* 여기에 너가 이전에 작성한 전체 CSS 코드 삽입하면 됨 */
+
+    .arrow-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
     }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="spinner"></div>
+    <div class="loading-text">AI가 분석 중입니다...</div>
   </div>
-  <h1>AI Try-On 위치 분석</h1>
+
+  <h1>🤖 AI Try-On 위치 분석</h1>
+
   <form action="/api/v1/upload" method="POST" enctype="multipart/form-data">
     <input type="file" name="image" accept="image/*" required>
-    <button type="submit">업로드</button>
+    <button type="submit">🚀 분석 시작하기</button>
   </form>
 
   <% if (imageUrl) { %>
   <div id="modal">
     <div class="modal-content">
-      <span class="close-btn" onclick="document.getElementById('modal').remove()">&times;</span>
-      <h2 style="margin-bottom:1rem;">분석된 결과</h2>
-      <img id="sourceImg" src="<%= imageUrl %>" style="display:none;" crossorigin="anonymous">
-      <div class="canvas-wrapper">
-        <canvas id="canvas"></canvas>
+      <div class="arrow-overlay" id="arrowOverlay"></div>
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <div class="analysis-container">
+        <div class="canvas-section">
+          <div class="canvas-wrapper">
+            <img id="sourceImg" src="<%= imageUrl %>" style="display:none;" crossorigin="anonymous">
+            <canvas id="canvas"></canvas>
+          </div>
+        </div>
+        <div class="labels-section">
+          <div class="label-item">
+            <div class="label-text upper-label" id="upperLabel">👕 상의</div>
+          </div>
+          <div class="label-item">
+            <div class="label-text lower-label" id="lowerLabel">👖 하의</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
   <script>
     const img = document.getElementById('sourceImg');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    let upperPoint = null;
+    let lowerPoint = null;
 
-    function resizeCanvasToImage(img) {
-      const aspect = img.naturalWidth / img.naturalHeight;
-      const modal = document.querySelector('.canvas-wrapper');
-      const width = modal.clientWidth;
-      canvas.width = width;
-      canvas.height = width / aspect;
+    function closeModal() {
+      document.getElementById('modal').remove();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    function createArrow(startX, startY, endX, endY, color, className, delay) {
+      const arrowOverlay = document.getElementById('arrowOverlay');
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+      const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+
+      const arrowLine = document.createElement('div');
+      arrowLine.className = `arrow-line ${className}-line`;
+      arrowLine.style.left = startX + 'px';
+      arrowLine.style.top = startY + 'px';
+      arrowLine.style.width = length + 'px';
+      arrowLine.style.transform = `rotate(${angle}deg)`;
+      arrowLine.style.animationDelay = delay + 's';
+      arrowOverlay.appendChild(arrowLine);
+
+      const arrowHead = document.createElement('div');
+      arrowHead.className = `arrow-head ${className}-head`;
+      arrowHead.style.left = (endX - 12) + 'px';
+      arrowHead.style.top = (endY - 8) + 'px';
+      arrowHead.style.animationDelay = (delay + 0.8) + 's';
+      arrowOverlay.appendChild(arrowHead);
+    }
+
+    function drawConnectingArrows() {
+      if (!upperPoint || !lowerPoint) return;
+
+      const modalRect = document.querySelector('.modal-content').getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      const upperLabelRect = document.getElementById('upperLabel').getBoundingClientRect();
+      const lowerLabelRect = document.getElementById('lowerLabel').getBoundingClientRect();
+
+      const upperStartX = canvasRect.left + upperPoint.x - modalRect.left;
+      const upperStartY = canvasRect.top + upperPoint.y - modalRect.top;
+      const lowerStartX = canvasRect.left + lowerPoint.x - modalRect.left;
+      const lowerStartY = canvasRect.top + lowerPoint.y - modalRect.top;
+
+      const upperEndX = upperLabelRect.left - modalRect.left;
+      const upperEndY = upperLabelRect.top + upperLabelRect.height / 2 - modalRect.top;
+      const lowerEndX = lowerLabelRect.left - modalRect.left;
+      const lowerEndY = lowerLabelRect.top + lowerLabelRect.height / 2 - modalRect.top;
+
+      const arrowOverlay = document.getElementById('arrowOverlay');
+      arrowOverlay.innerHTML = '';
+
+      createArrow(upperStartX, upperStartY, upperEndX, upperEndY, '#e74c3c', 'upper-arrow', 0.8);
+      createArrow(lowerStartX, lowerStartY, lowerEndX, lowerEndY, '#3498db', 'lower-arrow', 1.2);
     }
 
     const pose = new Pose({
@@ -172,6 +521,11 @@
     pose.setOptions({ modelComplexity: 1, smoothLandmarks: true });
 
     pose.onResults((results) => {
+      const maxWidth = 400;
+      const aspect = img.naturalWidth / img.naturalHeight;
+      canvas.width = maxWidth;
+      canvas.height = maxWidth / aspect;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -186,25 +540,52 @@
       const bottomX = ((lm[23].x + lm[24].x) / 2) * scaleX;
       const bottomY = ((lm[25].y + lm[26].y) / 2) * scaleY;
 
-      ctx.fillStyle = "red";
-      ctx.beginPath();
-      ctx.arc(topX, topY, 6, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.fillText("상의", topX + 8, topY);
+      upperPoint = { x: topX, y: topY };
+      lowerPoint = { x: bottomX, y: bottomY };
 
-      ctx.fillStyle = "blue";
+      ctx.shadowColor = 'rgba(231, 76, 60, 0.6)';
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = "#e74c3c";
       ctx.beginPath();
-      ctx.arc(bottomX, bottomY, 6, 0, 2 * Math.PI);
+      ctx.arc(topX, topY, 10, 0, 2 * Math.PI);
       ctx.fill();
-      ctx.fillText("하의", bottomX + 8, bottomY);
+      ctx.shadowColor = 'transparent';
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(topX, topY, 4, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.shadowColor = 'rgba(52, 152, 219, 0.6)';
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = "#3498db";
+      ctx.beginPath();
+      ctx.arc(bottomX, bottomY, 10, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(bottomX, bottomY, 4, 0, 2 * Math.PI);
+      ctx.fill();
+
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+
+      setTimeout(() => {
+        drawConnectingArrows();
+      }, 1000);
 
       document.getElementById('loadingScreen').style.display = 'none';
     });
 
     img.onload = () => {
-      resizeCanvasToImage(img);
       pose.send({ image: img });
     };
+
+    window.addEventListener('resize', () => {
+      if (upperPoint && lowerPoint) {
+        setTimeout(drawConnectingArrows, 100);
+      }
+    });
   </script>
   <% } else { %>
   <script>

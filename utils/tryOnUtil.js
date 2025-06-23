@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const API_KEY   = 'fa-DVd4jt7wZQUL-lj4zAnsNa8jCkapGutcrAQn2';
+const API_KEY   = '';
 const BASE_URL  = 'https://api.fashn.ai/v1';
 const NGROK_URL = 'https://<your-ngrok-subdomain>.ngrok.io'; // 절대경로 보정용
 
@@ -30,7 +30,14 @@ async function processTryOn(avatarUrl, clothingUrl, cartId, userId, type) {
         mode: 'balanced'
       })
     });
-    const runData = await runRes.json();
+    const runText = await runRes.text();
+    let runData;
+    try {
+      runData = JSON.parse(runText);
+    } catch (e) {
+      console.error('❌ Try-On API에서 JSON이 아닌 응답:', runText.slice(0, 300));
+      throw new Error('Try-On API에서 JSON이 아닌 응답을 받았습니다.');
+    }
     if (!runRes.ok || !runData.id) throw new Error(runData.error || 'Try-On 실행 실패');
 
     const predictionId = runData.id;
@@ -61,19 +68,20 @@ async function processTryOn(avatarUrl, clothingUrl, cartId, userId, type) {
 
     // 👉 Cloudinary 없이 Fashn URL 직접 반환
     return fashnOutput;
-  } catch (err) {
-  if (err instanceof Error) {
-    // fetch로부터의 에러 객체는 대부분 Error 인스턴스지만, 내부 정보를 추가로 출력할 수 있음
-    console.error('❌ Try-On Error:', err.message);
+  } catch (error) {
+    if (error.response) {
+      console.error('Try-On API Error:', error.response.status, error.response.data);
+      return res.status(error.response.status).json({
+        error: 'API 요청 실패',
+        details: error.response.data
+      });
+    }
+    console.error('Try-On API Error:', error.message);
+    res.status(500).json({ 
+      error: '가상 피팅 실패',
+      message: error.message 
+    });
   }
-
-  // 혹시 API 응답 객체 자체를 throw한 경우
-  if (typeof err === 'object') {
-    console.error('🔍 에러 상세:', JSON.stringify(err, null, 2));
-  }
-
-  throw err;
-}
 }
 
 module.exports = { processTryOn };

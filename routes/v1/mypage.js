@@ -10,8 +10,8 @@ const cloudinary = require("cloudinary").v2
 // Cloudinary 설정
 cloudinary.config({
   cloud_name: 'dplzmk1ex',
-  api_key: '682876142984314',
-  api_secret: '9YMNyCAuH9tkyVxevCCgCYIirlE' // 보안을 위해 환경변수에서 관리하세요
+  api_key: '',
+  api_secret: '' // 보안을 위해 환경변수에서 관리하세요
 })
 
 const upload = multer({

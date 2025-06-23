@@ -9,8 +9,8 @@ const { CloudinaryStorage } = require("multer-storage-cloudinary")
 // 🔧 Cloudinary 설정
 cloudinary.config({
   cloud_name: 'dplzmk1ex',
-  api_key: '682876142984314',
-  api_secret: '9YMNyCAuH9tkyVxevCCgCYIirlE' // 실사용 시 .env에 넣는 걸 권장
+  api_key: '',
+  api_secret: '' // 실사용 시 .env에 넣는 걸 권장
 })
 
 // 📁 Cloudinary 저장소 설정

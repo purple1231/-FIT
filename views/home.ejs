@@ -41,9 +41,13 @@
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #e74c3c;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
         }
 
         .nav-links {
@@ -100,11 +104,10 @@
             border: 2px solid #e74c3c;
         }
 
-        /* Hero Section */
+        /* Hero Section - 회색과 주황색 배경 */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/placeholder.svg?height=600&width=1200');
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(135deg, #6c757d 0%, #ff6b35 50%, #495057 100%);
+            position: relative;
             height: 100vh;
             display: flex;
             align-items: center;
@@ -112,16 +115,100 @@
             text-align: center;
             color: white;
             margin-top: 80px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 107, 53, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(108, 117, 125, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 107, 53, 0.2) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
         }
 
         .hero-content h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .hero-content p {
             font-size: 1.2rem;
             margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* AI Fitting Images - 클로즈업 및 반투명 */
+        .ai-fitting-image {
+            position: absolute;
+            width: 250px;
+            height: 350px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            opacity: 0.7;
+            backdrop-filter: blur(1px);
+        }
+
+        .ai-fitting-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        .ai-fitting-left {
+            left: 8%;
+            top: 15%;
+            animation: floatLeft 6s ease-in-out infinite;
+        }
+
+        .ai-fitting-left img {
+            object-position: center 20%; /* 머리와 가슴 부분 클로즈업 */
+            transform: scale(1.3);
+        }
+
+        .ai-fitting-right {
+            right: 8%;
+            top: 25%;
+            animation: floatRight 6s ease-in-out infinite reverse;
+        }
+
+        .ai-fitting-right img {
+            object-position: center 80%; /* 하체 부분 클로즈업 */
+            transform: scale(1.3);
+        }
+
+        @keyframes floatLeft {
+            0%, 100% { 
+                transform: translateY(0px) rotate(-1deg); 
+                opacity: 0.7;
+            }
+            50% { 
+                transform: translateY(-25px) rotate(1deg); 
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes floatRight {
+            0%, 100% { 
+                transform: translateY(0px) rotate(1deg); 
+                opacity: 0.7;
+            }
+            50% { 
+                transform: translateY(-20px) rotate(-1deg); 
+                opacity: 0.8;
+            }
         }
 
         .btn {
@@ -148,53 +235,46 @@
         }
 
         .section-title {
-            text-align: center;
+            text-align: left;
+            margin-left: 10%;
             font-size: 2.5rem;
             margin-bottom: 3rem;
             color: #333;
         }
 
         .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: flex;
             gap: 2rem;
+            justify-content: flex-start;
+            margin-left: 10%;
         }
 
         .category-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s;
+            background: transparent;
+            border: none;
             cursor: pointer;
-            border: 3px solid transparent;
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .category-card.active {
-            border-color: #e74c3c;
-            background: #e74c3c;
-            color: white;
-        }
-
-        .category-card.active h3 {
-            color: white;
-        }
-
-        .category-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
+            transition: all 0.3s;
+            text-align: center;
         }
 
         .category-card h3 {
-            padding: 1rem;
-            text-align: center;
-            font-size: 1.3rem;
-            transition: color 0.3s;
+            font-size: 1.5rem;
+            color: #666;
+            transition: all 0.3s;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            background: transparent;
+        }
+
+        .category-card:hover h3 {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .category-card.active h3 {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            font-weight: bold;
         }
 
         /* Featured Products */
@@ -247,6 +327,26 @@
             color: #999;
             font-size: 1rem;
             margin-right: 0.5rem;
+        }
+
+        /* Recommended Products - Fixed Image Aspect Ratio */
+        .recommended-products {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+
+        .recommended-products .product-card {
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recommended-products .product-card img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 3/4;
+            object-fit: contain;
+            background: white;
         }
 
         /* Newsletter */
@@ -421,6 +521,368 @@
                 width: 100%;
                 right: -100%;
             }
+
+            .ai-fitting-left, .ai-fitting-right {
+                width: 180px;
+                height: 250px;
+                opacity: 0.6;
+            }
+
+            .ai-fitting-left {
+                left: 3%;
+                top: 10%;
+            }
+
+            .ai-fitting-right {
+                right: 3%;
+                top: 20%;
+            }
+
+            .category-grid {
+                margin-left: 5%;
+            }
+
+            .section-title {
+                margin-left: 5%;
+            }
+        }
+
+        /* Modal Styles for AI Try-On Analysis */
+        #modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          backdrop-filter: blur(15px);
+          background-color: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: fadeIn 0.6s ease-out;
+          z-index: 1000;
+          padding: 2rem;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 25px;
+          padding: 2.5rem;
+          width: 95vw;
+          max-width: 1200px;
+          height: 80vh;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+          animation: popUp 0.5s ease-out;
+          position: relative;
+          display: flex;
+          gap: 0;
+          overflow: hidden;
+        }
+
+        @keyframes popUp {
+          0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
+          position: absolute;
+          top: 20px;
+          right: 25px;
+          font-size: 28px;
+          color: #666;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.8);
+          z-index: 10;
+        }
+
+        .close-btn:hover {
+          color: #333;
+          background: rgba(255, 255, 255, 1);
+          transform: scale(1.1);
+        }
+
+        .analysis-container {
+          display: flex;
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+
+        .canvas-section {
+          flex: 3;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          background: #f8f9fa;
+          border-radius: 15px;
+          overflow: hidden;
+        }
+
+        .canvas-wrapper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        #modalCanvas {
+          max-width: 100%;
+          max-height: 100%;
+          border-radius: 10px;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .labels-section {
+          flex: 3;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 0;
+          background: white;
+          padding: 2rem;
+          border-radius: 15px;
+          position: relative;
+        }
+
+        .label-item {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          opacity: 0;
+          transform: translateX(50px);
+          animation: slideInRight 0.8s ease-out forwards;
+        }
+
+        .label-item:nth-child(1) {
+          animation-delay: 1.2s;
+        }
+
+        .label-item:nth-child(2) {
+          animation-delay: 1.6s;
+        }
+
+        @keyframes slideInRight {
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .label-text {
+          font-size: 1.8rem;
+          font-weight: bold;
+          color: #333;
+          padding: 1.5rem 2rem;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+          border-radius: 15px;
+          border: 2px solid transparent;
+          background-clip: padding-box;
+          position: relative;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        }
+
+        .label-text:hover {
+          transform: translateX(-10px) scale(1.05);
+          box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .upper-label {
+          color: #e74c3c;
+        }
+
+        .lower-label {
+          color: #3498db;
+        }
+
+        /* Enhanced Arrow Styles with Animations */
+        .arrow-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 5;
+        }
+
+        .arrow-line {
+          position: absolute;
+          height: 3px;
+          border-radius: 2px;
+          transform-origin: left center;
+          opacity: 0;
+          animation: drawArrowLine 1.2s ease-out forwards;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .arrow-head {
+          position: absolute;
+          width: 0;
+          height: 0;
+          border-style: solid;
+          opacity: 0;
+          animation: fadeInArrowHead 0.6s ease-out forwards;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .upper-arrow-line {
+          background: linear-gradient(90deg, #e74c3c, #ff6b6b);
+          animation-delay: 1.5s;
+        }
+
+        .lower-arrow-line {
+          background: linear-gradient(90deg, #3498db, #74b9ff);
+          animation-delay: 2.0s;
+        }
+
+        .upper-arrow-head {
+          border-left: 15px solid #e74c3c;
+          border-top: 8px solid transparent;
+          border-bottom: 8px solid transparent;
+          animation-delay: 2.2s;
+        }
+
+        .lower-arrow-head {
+          border-left: 15px solid #3498db;
+          border-top: 8px solid transparent;
+          border-bottom: 8px solid transparent;
+          animation-delay: 2.7s;
+        }
+
+        @keyframes drawArrowLine {
+          0% {
+            opacity: 0;
+            transform: scaleX(0);
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 1;
+            transform: scaleX(1);
+          }
+        }
+
+        @keyframes fadeInArrowHead {
+          0% {
+            opacity: 0;
+            transform: scale(0) rotate(0deg);
+          }
+          50% {
+            transform: scale(1.2) rotate(5deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+        }
+
+        /* Pulsing animation for detected points */
+        @keyframes pulsePoint {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          50% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+        }
+
+        #loadingScreen {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        }
+
+        .spinner {
+          width: 60px;
+          height: 60px;
+          border: 6px solid #e3e3e3;
+          border-top: 6px solid #667eea;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+          color: #667eea;
+          font-size: 1.1rem;
+          font-weight: 500;
+        }
+
+        /* Make recommended product images clickable */
+        .recommended-products .product-card {
+          cursor: pointer;
+          transition: transform 0.3s ease;
+        }
+
+        .recommended-products .product-card:hover {
+          transform: scale(1.05);
+        }
+
+        /* Responsive modal */
+        @media (max-width: 1024px) {
+          .modal-content {
+            flex-direction: column;
+            height: 90vh;
+          }
+          
+          .analysis-container {
+            flex-direction: column;
+          }
+          
+          .canvas-section {
+            flex: 2;
+            margin-bottom: 1rem;
+          }
+          
+          .labels-section {
+            flex: 1;
+            flex-direction: row;
+            gap: 1rem;
+          }
+          
+          .label-item {
+            flex: 1;
+          }
+          
+          .label-text {
+            font-size: 1.4rem;
+            padding: 1rem;
+          }
         }
     </style>
 </head>
@@ -428,7 +890,9 @@
     <!-- Header -->
     <header>
         <nav class="container">
-            <div class="logo">Fashion Store</div>
+            <div class="logo">
+                <img src="/https://res.cloudinary.com/dplzmk1ex/image/upload/v1750611338/ChatGPT_Image_2025%EB%85%84_6%EC%9B%94_15%EC%9D%BC_%EC%98%A4%EC%A0%84_01_43_06_yofrkr.png" alt="Fashion Store Logo">
+            </div>
             <ul class="nav-links">
                 <li><a href="#home">홈</a></li>
                 <li><a href="#categories">카테고리</a></li>
@@ -444,11 +908,7 @@
                     <% } %>
                 </a>
                 <a href="/mypage">
-                    <% if (user && user.my_url) { %>
-                        <img src="/<%= user.my_url %>" alt="프로필" class="profile-icon">
-                    <% } else { %>
-                        👤
-                    <% } %>
+                    👤
                 </a>
             </div>
         </nav>
@@ -456,6 +916,18 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
+        <!-- AI Fitting Images -->
+        <% if (typeof ai_image !== 'undefined' && ai_image && ai_image.length >= 2) { %>
+        <div class="ai-fitting-container">
+            <div class="ai-fitting-image ai-fitting-left">
+                <img src="<%= ai_image[0] %>" alt="상의 피팅 이미지">
+            </div>
+            <div class="ai-fitting-image ai-fitting-right">
+                <img src="<%= ai_image[1] %>" alt="하의 피팅 이미지">
+            </div>
+        </div>
+        <% } %>
+        
         <div class="hero-content">
             <h1>최신 패션 트렌드</h1>
             <p>스타일리시하고 편안한 의류를 만나보세요</p>
@@ -469,11 +941,9 @@
             <h2 class="section-title">카테고리</h2>
             <div class="category-grid">
                 <div class="category-card" id="top-category" onclick="filterProducts('상의')">
-                    <img src="/placeholder.svg?height=200&width=250" alt="상의">
                     <h3>상의</h3>
                 </div>
                 <div class="category-card" id="bottom-category" onclick="filterProducts('하의')">
-                    <img src="/placeholder.svg?height=200&width=250" alt="하의">
                     <h3>하의</h3>
                 </div>
             </div>
@@ -491,27 +961,27 @@
     </section>
 
     <!-- 추천 상품 EJS 서버 렌더링 방식 -->
-    <% 
-      // 상의 2개, 하의 2개 추출
-      const shirts = recommended.filter(p => p.type === 'shirt').slice(0, 2);
-      const pants = recommended.filter(p => p.type === 'pants').slice(0, 2);
-      const gridItems = [...shirts, ...pants];
+    <%
+    const shirts = recommended.filter(p => p.type === 'shirt').slice(0, 2);
+    const pants = recommended.filter(p => p.type === 'pants').slice(0, 2);
+    const gridItems = [...shirts, ...pants];
+
+    const ai_images = ai_image || []; // ✅ 서버에서 받은 ai_image 배열 사용
     %>
-    <% if (gridItems.length > 0) { %>
+
+    <% if (ai_images.length > 0) { %>
     <section class="recommended-products">
-      <div class="container">
-        <h2 class="section-title">회원님을 위한 추천 상품</h2>
+        <div class="container">
+            <h2 class="section-title">회원님을 위한 추천 상품</h2>
         <div class="product-grid" style="grid-template-columns: repeat(2, 1fr);">
-          <% gridItems.forEach(function(product) { %>
-            <div class="product-card" style="display:flex;align-items:center;justify-content:center;height:120px;">
-              <a href="<%= product.image_url %>" target="_blank" style="color:#333;text-decoration:underline;word-break:break-all;">
-                <%= product.image_url %>
-              </a>
-            </div>
-          <% }); %>
+            <% ai_images.forEach(function(imgUrl, index) { %>
+                <div class="product-card" onclick="openModal('<%= imgUrl %>', <%= index %>)">
+                    <img src="<%= imgUrl %>" alt="AI 피팅 이미지">
+                </div>
+            <% }); %>
         </div>
-      </div>
-    </section>
+    </div>
+</section>
     <% } %>
 
     <!-- Newsletter -->
@@ -588,6 +1058,50 @@
         </div>
     </div>
 
+    <!-- Loading Screen -->
+    <div id="loadingScreen" style="display: none;">
+      <div class="spinner"></div>
+      <div class="loading-text">AI가 분석 중입니다...</div>
+    </div>
+
+    <!-- Modal for AI Try-On Analysis -->
+    <div id="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="arrow-overlay" id="arrowOverlay"></div>
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="analysis-container">
+        <div class="canvas-section">
+            <div class="canvas-wrapper">
+            <img id="sourceImg" style="display:none;" crossorigin="anonymous">
+            <canvas id="modalCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- 상의 / 하의 텍스트 + 이름 + 가격 표시 영역 -->
+        <div class="labels-section">
+        <% if (shirts[0]) { %>
+        <div class="label-item">
+            <div class="label-text upper-label" id="upperLabel" style="cursor: pointer;"
+                onclick="goToDetailFromModal(<%= shirts[0].id %>)">
+            👕 상의: <%= shirts[0].name %> (<%= Number(shirts[0].price).toLocaleString() %>원)
+            </div>
+        </div>
+        <% } %>
+
+        <% if (pants[0]) { %>
+            <div class="label-item">
+            <div class="label-text lower-label" id="lowerLabel" style="cursor: pointer;"
+                onclick="goToDetailFromModal(<%= pants[0].id %>)">
+                👖 하의: <%= pants[0].name %> (<%= Number(pants[0].price).toLocaleString() %>원)
+            </div>
+            </div>
+        <% } %>
+        </div>
+        </div>
+    </div>
+    </div>
+
+
     <script>
         // Sample product data
         let products = []; // 전역에서 사용할 DB 기반 상품 목록
@@ -617,7 +1131,6 @@
                             <div class="product-price">
                                 ${Number(product.price).toLocaleString()}원
                             </div>
-                            <button class="btn" onclick="event.stopPropagation(); addToCart(${product.id})">장바구니 담기</button>
                         </div>
                     </div>
                 `).join('');
@@ -663,34 +1176,6 @@
             }
         }
 
-        // Add to cart
-        async function addToCart(productId) {
-            try {
-                const response = await fetch('/api/v1/gotoCart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        clothId: productId,
-                        quantity: 1 
-                    })
-                });
-
-                if (response.ok) {
-                    alert('장바구니에 추가되었습니다!');
-                    // 장바구니 개수 업데이트
-                    updateCartCount();
-                } else {
-                    const errorData = await response.json();
-                    alert(errorData.message || '장바구니 추가에 실패했습니다.');
-                }
-            } catch (error) {
-                console.error('장바구니 추가 오류:', error);
-                alert('장바구니 추가 중 오류가 발생했습니다.');
-            }
-        }
-
         // 장바구니 개수 업데이트
         async function updateCartCount() {
             try {
@@ -716,39 +1201,6 @@
             } catch (error) {
                 console.error('장바구니 개수 조회 오류:', error);
             }
-        }
-
-        // Update cart UI
-        function updateCartUI() {
-            const cartCount = document.getElementById('cart-count');
-            const cartItems = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            
-            // Update cart count
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartCount.textContent = totalItems;
-            
-            // Update cart items
-            cartItems.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <img src="${item.image_url}" alt="${item.name}">
-                    <div class="cart-item-info">
-                        <h4>${item.name}</h4>
-                        <div class="cart-item-price">${item.price.toLocaleString()}원 x ${item.quantity}</div>
-                    </div>
-                    <button onclick="removeFromCart(${item.id})" style="background: none; border: none; color: #e74c3c; cursor: pointer;">&times;</button>
-                </div>
-            `).join('');
-            
-            // Update total
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            cartTotal.textContent = total.toLocaleString() + '원';
-        }
-
-        // Remove from cart
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            updateCartUI();
         }
 
         // Toggle cart
@@ -810,6 +1262,231 @@
             document.body.appendChild(form);
             form.submit();
         }
+
+        // Modal functionality for AI Try-On Analysis
+        let upperPoint = null;
+        let lowerPoint = null;
+        let pose = null;
+
+        // Initialize MediaPipe Pose when needed
+        function initializePose() {
+          if (typeof Pose === 'undefined') {
+            // Load MediaPipe scripts dynamically
+            const script1 = document.createElement('script');
+            script1.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose';
+            document.head.appendChild(script1);
+            
+            const script2 = document.createElement('script');
+            script2.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils';
+            document.head.appendChild(script2);
+            
+            script1.onload = () => {
+              setupPose();
+            };
+          } else {
+            setupPose();
+          }
+        }
+
+        function setupPose() {
+          pose = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+          });
+          pose.setOptions({ modelComplexity: 1, smoothLandmarks: true });
+          
+          pose.onResults((results) => {
+            const canvas = document.getElementById('modalCanvas');
+            const ctx = canvas.getContext('2d');
+            const img = document.getElementById('sourceImg');
+            
+            const maxWidth = 400;
+            const aspect = img.naturalWidth / img.naturalHeight;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth / aspect;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const lm = results.poseLandmarks;
+            if (!lm) return;
+
+            const scaleX = canvas.width;
+            const scaleY = canvas.height;
+
+            const topX = ((lm[11].x + lm[12].x) / 2) * scaleX;
+            const topY = ((lm[11].y + lm[12].y) / 2) * scaleY;
+            const bottomX = ((lm[23].x + lm[24].x) / 2) * scaleX;
+            const bottomY = ((lm[25].y + lm[26].y) / 2) * scaleY;
+
+            upperPoint = { x: topX, y: topY };
+            lowerPoint = { x: bottomX, y: bottomY };
+
+            // Draw upper point with pulsing animation
+            ctx.shadowColor = 'rgba(231, 76, 60, 0.6)';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = "#e74c3c";
+            ctx.beginPath();
+            ctx.arc(topX, topY, 10, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(topX, topY, 4, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Draw lower point with pulsing animation
+            ctx.shadowColor = 'rgba(52, 152, 219, 0.6)';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = "#3498db";
+            ctx.beginPath();
+            ctx.arc(bottomX, bottomY, 10, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(bottomX, bottomY, 4, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+
+        
+
+            document.getElementById('loadingScreen').style.display = 'none';
+          });
+        }
+
+        function openModal(imageUrl, index) {
+          document.getElementById('loadingScreen').style.display = 'flex';
+          document.getElementById('modal').style.display = 'flex';
+          
+          const img = document.getElementById('sourceImg');
+          img.src = imageUrl;
+          
+          if (!pose) {
+            initializePose();
+          }
+          
+          img.onload = () => {
+            if (pose) {
+              pose.send({ image: img });
+            }
+          };
+        }
+
+        function closeModal() {
+          document.getElementById('modal').style.display = 'none';
+          document.getElementById('loadingScreen').style.display = 'none';
+          
+          // Reset points
+          upperPoint = null;
+          lowerPoint = null;
+          
+          // Clear arrows
+          const arrowOverlay = document.getElementById('arrowOverlay');
+          if (arrowOverlay) {
+            arrowOverlay.innerHTML = '';
+          }
+        }
+
+        
+        function createArrowPath(startX, startY, endX, endY, color, className) {
+        const arrowOverlay = document.getElementById('arrowOverlay');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+        const midX = (startX + endX) / 2;
+
+        const d = `M${startX},${startY} C${midX},${startY} ${midX},${endY} ${endX},${endY}`;
+
+        path.setAttribute('d', d);
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', '3');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('class', className);
+
+        arrowOverlay.appendChild(path);
+        }
+
+        function drawConnectingArrows() {
+        const modalRect = document.querySelector('.modal-content').getBoundingClientRect();
+        const canvas = document.getElementById('modalCanvas');
+        const canvasRect = canvas.getBoundingClientRect();
+        const upperLabelRect = document.getElementById('upperLabel').getBoundingClientRect();
+        const lowerLabelRect = document.getElementById('lowerLabel').getBoundingClientRect();
+
+        // 상의와 하의의 위치를 추정 (이미지 상단과 하단의 중앙)
+        const img = document.getElementById('sourceImg');
+        const imgRect = img.getBoundingClientRect();
+        const upperStartX = imgRect.left + imgRect.width / 2 - modalRect.left;
+        const upperStartY = imgRect.top + imgRect.height * 0.25 - modalRect.top;
+        const lowerStartX = imgRect.left + imgRect.width / 2 - modalRect.left;
+        const lowerStartY = imgRect.top + imgRect.height * 0.75 - modalRect.top;
+
+        const upperEndX = upperLabelRect.left - modalRect.left;
+        const upperEndY = upperLabelRect.top + upperLabelRect.height / 2 - modalRect.top;
+        const lowerEndX = lowerLabelRect.left - modalRect.left;
+        const lowerEndY = lowerLabelRect.top + lowerLabelRect.height / 2 - modalRect.top;
+
+        const arrowOverlay = document.getElementById('arrowOverlay');
+        arrowOverlay.innerHTML = '';
+
+        // Ensure SVG element exists
+        let svg = document.getElementById('arrowSvg');
+        if (!svg) {
+            svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('id', 'arrowSvg');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            arrowOverlay.appendChild(svg);
+        }
+        svg.innerHTML = '';
+
+        // Use curved arrows
+        const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const midX1 = (upperStartX + upperEndX) / 2;
+        const d1 = `M${upperStartX},${upperStartY} C${midX1},${upperStartY} ${midX1},${upperEndY} ${upperEndX},${upperEndY}`;
+        path1.setAttribute('d', d1);
+        path1.setAttribute('stroke', '#e74c3c');
+        path1.setAttribute('stroke-width', '3');
+        path1.setAttribute('fill', 'none');
+        svg.appendChild(path1);
+
+        const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const midX2 = (lowerStartX + lowerEndX) / 2;
+        const d2 = `M${lowerStartX},${lowerStartY} C${midX2},${lowerStartY} ${midX2},${lowerEndY} ${lowerEndX},${lowerEndY}`;
+        path2.setAttribute('d', d2);
+        path2.setAttribute('stroke', '#3498db');
+        path2.setAttribute('stroke-width', '3');
+        path2.setAttribute('fill', 'none');
+        svg.appendChild(path2);
+        }
+
+        function goToDetailFromModal(itemId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/v1/detail';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'itemId';
+            input.value = itemId;
+
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            closeModal();
+          }
+        });
+
+        
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {

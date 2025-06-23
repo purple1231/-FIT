@@ -91,76 +91,189 @@ app.get("/mainImsi", (req, res) => res.render("mainImsi"))
 
 // 홈 페이지 렌더링
 // 로그인된 사용자만 접근 가능
+const { DateTime } = require("luxon"); // ⬅️ luxon을 최상단에서 import
+const minmin = 99990; // 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)// 추천 간격 (분 단위)
+
+
 app.get("/home", async (req, res) => {
   try {
     if (!req.session.user) {
-      return res.status(401).send("로그인이 필요합니다")
+      return res.status(401).send("로그인이 필요합니다");
     }
 
-    const userId = req.session.user.id
-    console.log("🔍 현재 사용자 ID:", userId) // 디버깅용
+    const userId = req.session.user.id;
+    console.log("🔍 현재 사용자 ID:", userId);
 
-    // 사용자 정보 조회 (프로필 이미지 포함)
-    const [userRows] = await db.execute("SELECT id, username, email, name, my_url FROM user WHERE id = ?", [userId])
-    const user = userRows[0] || req.session.user
+    // 사용자 정보 조회
+    const [userRows] = await db.execute(
+      "SELECT id, username, email, name, my_url FROM user WHERE id = ?",
+      [userId]
+    );
+    const user = userRows[0] || req.session.user;
 
-    // 장바구니 개수 조회 (기본값 설정)
-    let cartCount = 0
+    // 장바구니 개수 조회
+    let cartCount = 0;
     try {
-      const [cartItems] = await db.execute("SELECT COUNT(*) AS count FROM cart WHERE user_id = ?", [userId])
-      cartCount = cartItems[0]?.count || 0
-      console.log("🛒 장바구니 개수:", cartCount) // 디버깅용
+      const [cartItems] = await db.execute(
+        "SELECT COUNT(*) AS count FROM cart WHERE user_id = ?",
+        [userId]
+      );
+      cartCount = cartItems[0]?.count || 0;
+      console.log("🛒 장바구니 개수:", cartCount);
     } catch (cartError) {
-      console.error("장바구니 개수 조회 오류:", cartError)
-      cartCount = 0 // 에러 시 기본값
+      console.error("장바구니 개수 조회 오류:", cartError);
     }
 
-    // 상품 목록 조회 (기본값 설정)
-    let clothRows = []
-    let recommended = []
+    // 상품 목록 조회
+    let clothRows = [];
     try {
       const [clothResult] = await db.query(
-        `
-        SELECT * FROM cloth
-        WHERE id NOT IN (
-          SELECT cloth_id FROM cart WHERE user_id = ?
-        )
-      `,
-        [userId],
-      )
-      clothRows = clothResult || []
-
-    // ✅ 상의 2개, 하의 2개 추천
-    const shuffledShirts = clothRows.filter(item => item.type === 'shirt').sort(() => Math.random() - 0.5)
-    const shuffledPants = clothRows.filter(item => item.type === 'pants').sort(() => Math.random() - 0.5)
-    recommended = [...shuffledShirts.slice(0, 2), ...shuffledPants.slice(0, 2)]
-
-
-      console.log("👕 상품 개수:", clothRows.length) // 디버깅용
-      console.log("⭐ 추천 상품 다출력:", recommended) // 디버깅용
+        `SELECT * FROM cloth
+         WHERE id NOT IN (
+           SELECT cloth_id FROM cart WHERE user_id = ?
+         )`,
+        [userId]
+      );
+      clothRows = clothResult || [];
+      console.log("👕 상품 개수:", clothRows.length);
     } catch (clothError) {
-      console.error("상품 조회 오류:", clothError)
-      clothRows = []
-      recommended = []
+      console.error("상품 조회 오류:", clothError);
     }
 
+    // 추천 로직
+    let recommended = [];
+    let ai_image = [];
+
+    try {
+      const [recommandRows] = await db.query(
+        `SELECT * FROM recommand WHERE user_id = ? ORDER BY recommand_at DESC`,
+        [userId]
+      );
+
+      let needsNewRecommendation = recommandRows.length < 2;
+
+      if (!needsNewRecommendation) {
+        const now = DateTime.now().setZone("Asia/Seoul");
+        const nowTime = now.toFormat("HH:mm");
+        const lastRecommandAt = recommandRows[0].recommand_at;
+
+        const nowDateTime = DateTime.fromFormat(nowTime, "HH:mm", { zone: "Asia/Seoul" });
+        const lastDateTime = DateTime.fromFormat(lastRecommandAt, "HH:mm", { zone: "Asia/Seoul" });
+
+        if (nowDateTime.isValid && lastDateTime.isValid) {
+          const diffMinutes = nowDateTime.diff(lastDateTime, "minutes").minutes;
+          console.log(`🕓 추천 시간 차이: ${diffMinutes.toFixed(2)}분`);
+          if (diffMinutes > minmin) {
+            needsNewRecommendation = true;
+          } else {
+            console.log("🧊 기존 추천 유지");
+          }
+        } else {
+          console.warn("❌ 시간 포맷 파싱 실패, 새 추천 강제 실행");
+          needsNewRecommendation = true;
+        }
+      }
+
+      if (needsNewRecommendation) {
+        console.log("🔄 새 추천 생성 시작");
+
+        const shuffledShirts = clothRows.filter(item => item.type === "shirt").sort(() => Math.random() - 0.5);
+        const shuffledPants = clothRows.filter(item => item.type === "pants").sort(() => Math.random() - 0.5);
+
+        const top1 = shuffledShirts[0];
+        const top2 = shuffledShirts[1];
+        const bot1 = shuffledPants[0];
+        const bot2 = shuffledPants[1];
+
+        console.log("👕 추천 상의:", top1, top2);
+        console.log("👖 추천 하의:", bot1, bot2);
+
+        await db.query("DELETE FROM recommand WHERE user_id = ?", [userId]);
+
+        const currentTime = DateTime.now().setZone("Asia/Seoul").toFormat("HH:mm");
+
+        await db.query(
+          `INSERT INTO recommand (
+            user_id, cloth_top_image_url, cloth_bot_image_url, recommand_at,
+            top_id, bottom_id, top_price, bottom_price, top_name, bottom_name
+          ) VALUES 
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?),
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            userId, top1.image_url, bot1.image_url, currentTime,
+            top1.id, bot1.id, top1.price, bot1.price, top1.name, bot1.name,
+
+            userId, top2.image_url, bot2.image_url, currentTime,
+            top2.id, bot2.id, top2.price, bot2.price, top2.name, bot2.name
+          ]
+        );
+
+        recommended.push(top1, bot1, top2, bot2);
+        console.log("✅ 추천 2개 새로 생성 완료:", [
+          { top: top1.image_url, bot: bot1.image_url },
+          { top: top2.image_url, bot: bot2.image_url }
+        ]);
+      } else {
+        console.log("📦 recommand 테이블의 기존 추천 사용");
+
+        recommandRows.slice(0, 2).forEach(row => {
+          recommended.push(
+            {
+              id: row.top_id,
+              type: "shirt",
+              image_url: row.cloth_top_image_url,
+              price: row.top_price,
+              name: row.top_name
+            },
+            {
+              id: row.bottom_id,
+              type: "pants",
+              image_url: row.cloth_bot_image_url,
+              price: row.bottom_price,
+              name: row.bottom_name
+            }
+          );
+
+          if (row.ai_image_url) {
+            ai_image.push(row.ai_image_url);
+          }
+        });
+
+        console.log("🟢 추천 상품 불러오기 완료:", recommended);
+        console.log("🎨 AI 이미지:", ai_image);
+      }
+    } catch (recommendErr) {
+      console.error("추천 처리 오류:", recommendErr);
+    }
+
+    // 홈 렌더링
     res.render("home", {
-      user: user,
-      cartCount: cartCount, // 항상 숫자값 보장
+      user,
+      cartCount,
       products: clothRows,
-      recommended, // 🔥 4개 전달
-    })
+      recommended,
+      ai_image,
+      session: req.session
+    });
   } catch (error) {
-    console.error("홈 렌더링 에러:", error.message)
-    // 에러 시에도 기본값으로 렌더링
+    console.error("홈 렌더링 에러:", error.message);
     res.render("home", {
       user: req.session.user || { username: "Guest" },
       cartCount: 0,
       products: [],
       recommended: [],
-    })
+      ai_image: [],
+      session: req.session
+    });
   }
-})
+});
+
 
 app.get("/signup", (req, res) => {
   res.render("signup", {

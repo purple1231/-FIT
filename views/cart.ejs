@@ -372,6 +372,51 @@
             margin-bottom: 30px;
         }
 
+        /* AI 이미지 모달 추가 */
+        .ai-image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .ai-image-modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .ai-image-modal-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .ai-image-close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .ai-image-close:hover {
+            color: #e74c3c;
+        }
+
+
         @media (max-width: 768px) {
             .header-container {
                 flex-direction: column;
@@ -425,7 +470,9 @@
 <body>
     <header class="header">
         <div class="header-container">
-            <a href="/" class="logo">Fashion Store</a>
+            <a href="/home" class="logo">
+                <img src="https://res.cloudinary.com/dplzmk1ex/image/upload/v1750611338/ChatGPT_Image_2025%EB%85%84_6%EC%9B%94_15%EC%9D%BC_%EC%98%A4%EC%A0%84_01_43_06_yofrkr.png" alt="Fashion Store Logo" style="height: 48px;">
+            </a></a>
             
             <nav>
                 <ul class="nav-menu">
@@ -469,7 +516,7 @@
                                 
                                 <!-- AI 착용 이미지 (있을 때만 표시) -->
                                 <% if (item.ai_image) { %>
-                                    <div class="ai-image">
+                                    <div class="ai-image" onclick="openAiImageModal('<%= item.ai_image %>')">
                                         <img src="<%= item.ai_image %>" alt="<%= item.name %> AI 착용 이미지">
                                     </div>
                                 <% } %>
@@ -527,6 +574,14 @@
                     <a href="/" class="continue-shopping">쇼핑하러 가기</a>
                 </div>
             <% } %>
+        </div>
+    </div>
+
+        <!-- AI 이미지 모달 영역 추가 -->
+    <div id="aiImageModal" class="ai-image-modal">
+        <div class="ai-image-modal-content">
+            <span class="ai-image-close" onclick="closeAiImageModal()">&times;</span>
+            <img id="aiImageModalImg" src="" alt="AI 이미지 확대">
         </div>
     </div>
 
@@ -622,6 +677,27 @@
                 location.reload();
             }
         }
+
+
+        function openAiImageModal(imageUrl) {
+            const modal = document.getElementById('aiImageModal');
+            const modalImg = document.getElementById('aiImageModalImg');
+            modalImg.src = imageUrl;
+            modal.style.display = 'flex';
+        }
+
+        function closeAiImageModal() {
+            document.getElementById('aiImageModal').style.display = 'none';
+        }
+
+        // ESC로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeAiImageModal();
+        });
+
+
+
+
 
         function checkout() {
     const cartItems = document.querySelectorAll('.cart-item');

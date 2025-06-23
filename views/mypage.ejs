@@ -380,7 +380,9 @@
 <body>
     <header class="header">
         <div class="header-container">
-            <a href="/" class="logo"><%= shopName || 'Fashion Store' %></a>
+            <a href="/" class="logo">
+                <img src="https://res.cloudinary.com/dplzmk1ex/image/upload/v1750611338/ChatGPT_Image_2025%EB%85%84_6%EC%9B%94_15%EC%9D%BC_%EC%98%A4%EC%A0%84_01_43_06_yofrkr.png" alt="Fashion Store Logo" style="height: 40px; vertical-align: middle;">
+            </a></a>
             
             <nav>
                 <ul class="nav-menu">
@@ -411,10 +413,11 @@
                 <div class="user-info-summary">
                     <div class="profile-image-display">
                         <% if (user.my_url) { %>
-                            <img src="/<%= user.my_url %>" alt="프로필 이미지">
+                            <img src="<%= user.my_url %>" alt="프로필 미리보기">
                         <% } else { %>
                             <span class="placeholder">👤</span>
                         <% } %>
+
                     </div>
                     <div class="user-details">
                         <h3><%= user.name || user.username %></h3>

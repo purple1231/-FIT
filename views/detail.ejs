@@ -42,10 +42,20 @@
     </style>
 </head>
 <body>
+
+
+
+
+    
+    <input type="hidden" id="clothId" value="<%= item.id %>">
+    <input type="hidden" id="clothType" value="<%= item.type %>">
+    <input type="hidden" id="clothImageUrl" value="<%= item.image_url %>">
     <!-- Header -->
     <header>
         <nav class="container">
-            <a href="/home" class="logo">FIT AI 쇼핑몰</a>
+            <a href="/home" class="logo">
+                <img src="https://res.cloudinary.com/dplzmk1ex/image/upload/v1750611338/ChatGPT_Image_2025%EB%85%84_6%EC%9B%94_15%EC%9D%BC_%EC%98%A4%EC%A0%84_01_43_06_yofrkr.png" alt="Fashion Store Logo" style="height:40px;">
+            </a></a>
             <ul class="nav-links">
                 <li><a href="/home">홈</a></li>
                 <li><a href="#">카테고리</a></li>
@@ -88,27 +98,35 @@
                 <div class="product-images">
                     <img src="<%= item.image_url %>" alt="<%= item.name %>" class="main-image" id="mainImage">
                     <div class="thumbnail-images">
-                        <img src="<%= item.image_url %>" alt="썸네일 1" class="thumbnail active" onclick="changeMainImage(this)">
-                        <img src="https://source.unsplash.com/500x500?knitwear" alt="썸네일 2" class="thumbnail" onclick="changeMainImage(this)">
-                        <img src="https://source.unsplash.com/500x500?wool" alt="썸네일 3" class="thumbnail" onclick="changeMainImage(this)">
-                        <img src="https://source.unsplash.com/500x500?fashion" alt="썸네일 4" class="thumbnail" onclick="changeMainImage(this)">
+                        <img src="<%= item.image_url %>" alt="썸네일" class="thumbnail active" onclick="changeMainImage(this)">
                     </div>
                 </div>
 
                 <!-- Product Info -->
                 <div class="product-info">
-                    <h1 class="product-title"><%= item.name %></h1>
-                    
-                    <div class="product-rating">
-                        <div class="stars">
+                <h1 class="product-title"><%= item.name %></h1>
+
+                <div class="product-rating">
+                    <div class="stars">
+                        <% 
+                        const fullStars = Math.floor(avgRating);
+                        const hasHalfStar = avgRating - fullStars >= 0.5;
+                        for (let i = 1; i <= 5; i++) {
+                            if (i <= fullStars) { %>
                             <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+                        <%  } else if (i === fullStars + 1 && hasHalfStar) { %>
                             <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <span class="rating-text">4.5 (128 리뷰)</span>
+                        <%  } else { %>
+                            <i class="far fa-star"></i>
+                        <%  } 
+                        }
+                        %>
                     </div>
+                    <span class="rating-text">
+                        <%= avgRating %>점 (리뷰 <%= reviews.length %>개)
+                    </span>
+                </div>
+
 
                     <div class="product-price">
                         <span class="current-price"><%= item.price.toLocaleString() %>원</span>
@@ -259,10 +277,20 @@
                         </div>
                         <% if (review.ai_image_url) { %>
                             <div style="margin: 10px 0;">
-                            <img src="<%= review.ai_image_url %>" alt="AI 착샷" style="max-width: 250px; border: 1px solid #ccc; border-radius: 6px;">
+                                <img src="<%= review.ai_image_url %>" alt="AI 착샷" style="max-width: 250px; border: 1px solid #ccc; border-radius: 6px;">
+                                <p style="font-size: 14px; color: gray; margin-top: 4px;">AI 가상 피팅</p>
                             </div>
                         <% } %>
+
+                        <% if (review.real_image_url) { %>
+                            <div style="margin: 10px 0;">
+                                <img src="<%= review.real_image_url %>" alt="실제 착용 사진" style="max-width: 250px; border: 1px solid #ccc; border-radius: 6px;">
+                                <p style="font-size: 14px; color: gray; margin-top: 4px;">실제 착용 사진</p>
+                            </div>
+                        <% } %>
+
                         <p><%= review.content || '' %></p>
+
                         </div>
                     <% }); %>
                     <% } else { %>
@@ -405,7 +433,7 @@
                 </div>
                 <div class="preview-container" id="previewContainer">
                     <img id="previewImage" class="preview-image" alt="미리보기">
-                    <button class="btn btn-primary" onclick="processAI()">
+                    <button class="btn btn-primary" onclick="submitTryon()">
                         <i class="fas fa-magic"></i> AI 처리 시작
                     </button>
                 </div>
@@ -530,28 +558,6 @@
             });
         });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // detail.ejs에서 "장바구니 담기" 시, 해당 옷의 type(또는 category, gender 등)을 localStorage에 저장
         function addToCart() {
     const size = document.getElementById('selectedSize').textContent;
@@ -560,6 +566,7 @@
     const cloth_id = '<%= item.id %>';
     const name = '<%= item.name %>';
     const image_url = "<%= item.image_url %>";
+    const type = '<%= item.type %>'; // 옷의 type (예: '상의', '하의', '아우터' 등)
 
     const cartData = {
         user_id,
@@ -567,8 +574,12 @@
         name,
         image_url,
         size,
-        quantity
+        quantity,
+        type
     };
+
+    // 타입 콘솔로그로 확인
+    console.log("선택된 타입:", type);  
 
     console.log("보내는 데이터:", cartData);
 
@@ -711,15 +722,75 @@
         function goToCart() {
             window.location.href = '/cart';
         }  
+
+        let selectedFile = null;
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            selectedFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('previewImage').src = e.target.result;
+                document.getElementById('previewContainer').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+                
         
         
+        function downloadResult() {
+            const imageUrl = document.getElementById('downloadResult').dataset.url;
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'ai_result.jpg';
+            link.click();
+        }
         
-        
-        
-        
-        
-        
-        
+          async function submitTryon() {
+            const fileInput = document.getElementById('avatarInput');
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+            alert('이미지를 선택해주세요');
+            return;
+            }
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+            formData.append('cloth_id', document.getElementById('clothId').value);
+            formData.append('type', document.getElementById('clothType').value);
+            formData.append('image_url', document.getElementById('clothImageUrl').value);
+
+            try {
+            const res = await fetch('/api/v1/detail/ai-tryon', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                const img = document.getElementById('resultImage');
+                img.src = result.imageUrl;
+                document.getElementById('tryonResult').style.display = 'block';
+            } else {
+                alert('AI 처리 실패: ' + result.error);
+            }
+            } catch (err) {
+            console.error(err);
+            alert('서버 오류');
+            }
+        }
+
+        function downloadResult() {
+            const url = document.getElementById('resultImage').src;
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ai_result.jpg';
+            a.click();
+        }
         </script>
 
 

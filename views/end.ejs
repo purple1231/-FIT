@@ -1018,7 +1018,7 @@
             //navigator.clipboard.writeText(orderNumber).then(() => {
                 // 성공 메시지 표시
                 const toast = document.createElement('div');
-                toast.innerHTML = '✅ 추천 상품 페이지로 이동합니다!';
+                toast.innerHTML = '✅ 홈으로 이동합니다!';
                 toast.style.cssText = `
                     position: fixed;
                     top: 20px;
@@ -1041,7 +1041,7 @@
                 }, 2000);
 
                 setTimeout(() => {
-                    window.location.href = "/products";
+                    window.location.href = "/home";
                 }, 2500);
             //});
         });

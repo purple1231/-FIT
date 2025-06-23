@@ -38,6 +38,10 @@ router.post('/end', async (req, res) => {
             );
         }
 
+
+        // 장바구니 비우기
+        await db.query('UPDATE cart SET already = 1 WHERE user_id = ?', [user.id]);
+
         res.render('end'); // 결제 완료 페이지 렌더링
     } catch (err) {
         console.error('❌ /end 처리 중 오류:', err);

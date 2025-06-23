@@ -13,11 +13,11 @@ router.get("/", async (req, res) => {
   try {
     const [cartRows] = await db.execute(
       `
-            SELECT c.id AS cart_id, c.quantity, c.ai_cloth_url, cl.name, cl.price, cl.image_url
-            FROM cart c
-            LEFT JOIN cloth cl ON c.cloth_id = cl.id
-            WHERE c.user_id = ?
-        `,
+        SELECT c.id AS cart_id, c.quantity, c.ai_cloth_url, cl.name, cl.price, cl.image_url
+        FROM cart c
+        LEFT JOIN cloth cl ON c.cloth_id = cl.id
+        WHERE c.user_id = ? AND c.already != 1
+      `,
       [userId],
     )
 

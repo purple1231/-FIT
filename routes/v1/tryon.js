@@ -5,10 +5,11 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 
+//API Key 설정
+const RAPID_API_KEY = ""; 
+const RAPID_API_HOST = "try-on-diffusion.p.rapidapi.com";
 
 const upload = multer({ dest: 'uploads/' });
-
-
 
 // Try-on API 엔드포인트
 router.post('/tryon', upload.fields([
@@ -24,7 +25,7 @@ router.post('/tryon', upload.fields([
 
     const form = new FormData();
     
-    // 파일 스트림 추가 방식 변경
+    // 파일 스트림 추가
     form.append('avatar_image', 
       fs.createReadStream(req.files['avatar_image'][0].path), 
       {
@@ -41,14 +42,13 @@ router.post('/tryon', upload.fields([
       }
     );
 
-    // API 엔드포인트 및 파라미터 확인
     const apiUrl = 'https://try-on-diffusion.p.rapidapi.com/try-on-file';
     
     const response = await axios.post(apiUrl, form, {
       headers: {
         ...form.getHeaders(),
-        'X-RapidAPI-Key': 'd0d8c1c378msh37b6ef14ffd5e06p107260jsn92c6d5778a76',
-        'X-RapidAPI-Host': 'try-on-diffusion.p.rapidapi.com',
+        'X-RapidAPI-Key': RAPID_API_KEY,
+        'X-RapidAPI-Host': RAPID_API_HOST,
         'Content-Type': 'multipart/form-data'
       },
       responseType: 'arraybuffer',
@@ -63,7 +63,6 @@ router.post('/tryon', upload.fields([
   } catch (error) {
     console.error('Try-On API Error:', error.response?.data || error.message);
     
-    // API 응답이 있는 경우 그 내용을 클라이언트에 전달
     if (error.response) {
       return res.status(error.response.status).json({
         error: 'API 요청 실패',
@@ -76,7 +75,7 @@ router.post('/tryon', upload.fields([
       message: error.message 
     });
   } finally {
-    // 파일 정리
+    // 임시 파일 정리
     if (req.files['avatar_image']) {
       fs.unlinkSync(req.files['avatar_image'][0].path);
     }
@@ -85,6 +84,5 @@ router.post('/tryon', upload.fields([
     }
   }
 });
-
 
 module.exports = router;
